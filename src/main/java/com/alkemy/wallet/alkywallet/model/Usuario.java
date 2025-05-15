@@ -1,12 +1,12 @@
 package com.alkemy.wallet.alkywallet.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,10 +29,16 @@ public class Usuario {
     private boolean credentialsNonExpired;
     private boolean enabled;
 
+
+    //Relacion uno a muchos
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Cuenta> cuentas = new ArrayList<>();
+
     public Usuario() {
     }
 
-    public Usuario(String nombre, String apellido, String email, String password, boolean accountNonLocked, boolean accountNonExpired, boolean credentialsNonExpired, boolean enabled) {
+    public Usuario(Long id, String nombre, String apellido, String email, String password, boolean accountNonLocked, boolean accountNonExpired, boolean credentialsNonExpired, boolean enabled, List<Cuenta> cuentas) {
+        this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
@@ -41,5 +47,6 @@ public class Usuario {
         this.accountNonExpired = accountNonExpired;
         this.credentialsNonExpired = credentialsNonExpired;
         this.enabled = enabled;
+        this.cuentas = cuentas;
     }
 }
