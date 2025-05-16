@@ -1,5 +1,6 @@
 package com.alkemy.wallet.alkywallet.dto;
 
+import com.alkemy.wallet.alkywallet.model.Cuenta;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
