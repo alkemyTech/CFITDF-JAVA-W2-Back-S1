@@ -1,7 +1,18 @@
 package com.alkemy.wallet.alkywallet.model;
+
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "pago")
 public class Pago {
@@ -14,60 +25,13 @@ public class Pago {
 
     private String comercio;
 
-    private LocalDateTime fecha;
+    @Temporal(TemporalType.DATE)
+    private LocalDate fecha;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cuenta_id", nullable = false)
     private Cuenta cuenta;
 
-    // --- Constructores ---
-    public Pago() { }
-
-    public Pago(Double monto, String comercio, LocalDateTime fecha, Cuenta cuenta) {
-        this.monto = monto;
-        this.comercio = comercio;
-        this.fecha = fecha;
-        this.cuenta = cuenta;
-    }
-
-    // --- Getters y Setters ---
-    public Long getId() {
-        return id;
-    }
-
-    public Double getMonto() {
-        return monto;
-    }
-
-    public void setMonto(Double monto) {
-        this.monto = monto;
-    }
-
-    public String getComercio() {
-        return comercio;
-    }
-
-    public void setComercio(String comercio) {
-        this.comercio = comercio;
-    }
-
-    public LocalDateTime getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(LocalDateTime fecha) {
-        this.fecha = fecha;
-    }
-
-    public Cuenta getCuenta() {
-        return cuenta;
-    }
-
-    public void setCuenta(Cuenta cuenta) {
-        this.cuenta = cuenta;
-    }
-
-    // --- toString, equals y hashCode (opcional) ---
     @Override
     public String toString() {
         return "Pago{" +
