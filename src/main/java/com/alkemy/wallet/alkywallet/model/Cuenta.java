@@ -17,7 +17,6 @@ import lombok.Setter;
 @Table(name = "cuentas")
 public class Cuenta {
 
-
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
@@ -37,19 +36,19 @@ public class Cuenta {
 
         // Unidireccional hacia Transaccion
         @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-        @JoinColumn(name = "cuenta_id") // foreign key en Transaccion
+        @JoinColumn(name = "cuenta_id")
         private List<Transaccion> transacciones;
 
         // Unidireccional hacia Pago
         @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-        @JoinColumn(name = "cuenta_id") // foreign key en Pago
+        @JoinColumn(name = "cuenta_id")
         private List<Pago> pagos;
 
         // Unidireccional hacia Tarjeta
         @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-        @JoinColumn(name = "cuenta_id") // foreign key en Tarjeta
+        @JoinColumn(name = "cuenta_id")
         private List<Tarjeta> tarjetas;
 
-       @Column(nullable = false)
-       private boolean deleted = false;
+        @Column(nullable = false)
+        private boolean deleted = false;
 }
