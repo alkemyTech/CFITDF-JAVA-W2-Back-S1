@@ -40,18 +40,11 @@ public class Tarjeta {
         PREPAGA,
     }
 
-    /*
-    --- Relación muchos-a-uno con Cuenta
     @ManyToOne
     @JoinColumn(name = "cuenta_id")
     private Cuenta cuenta;
 
-    --- Relación uno-a-muchos con Transaccion
-
-        @OneToMany(mappedBy = "tarjeta", cascade = CascadeType.ALL, orphanRemoval = true)
-        private List<Transaccion> transacciones = new ArrayList<>();
-     */
-
-
+    @OneToMany(mappedBy = "tarjeta", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaccion> transacciones = new ArrayList<>();
 
 }
