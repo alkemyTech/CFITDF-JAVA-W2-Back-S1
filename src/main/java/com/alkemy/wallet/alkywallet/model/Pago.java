@@ -39,7 +39,6 @@ public class Pago {
                 ", monto=" + monto +
                 ", comercio='" + comercio + '\'' +
                 ", fecha=" + fecha +
-                ", cuentaId=" + (cuenta != null ? cuenta.getId() : null) +
                 '}';
     }
 }

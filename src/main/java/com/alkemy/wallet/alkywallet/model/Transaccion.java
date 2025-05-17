@@ -20,8 +20,7 @@ public class Transaccion {
     private LocalDate fecha;
     private double monto;
     private String descripcion;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "tipo_transaccion_id")
+
     @Enumerated(EnumType.STRING)
     private TipoTransaccion tipoTransaccion;
 }
