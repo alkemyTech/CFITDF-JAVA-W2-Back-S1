@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CuentaResponseDTO {
+public class CuentaDTO {
 
     private Long id;                      // Lo mantenemos para futuras operaciones
     private Double saldo;
@@ -18,7 +18,7 @@ public class CuentaResponseDTO {
     private String nombreUsuario;
     private String apellidoUsuario;
 
-    public CuentaResponseDTO(Cuenta cuenta) {
+    public CuentaDTO(Cuenta cuenta) {
         this.id = cuenta.getId();
         this.saldo = cuenta.getSaldo();
         this.tipo = cuenta.getTipo().getDescripcion();
