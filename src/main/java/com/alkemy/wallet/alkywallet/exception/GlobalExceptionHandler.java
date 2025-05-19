@@ -1,32 +1,53 @@
 package com.alkemy.wallet.alkywallet.exception;
 
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public String handleResourceNotFound(ResourceNotFoundException ex, Model model) {
-        model.addAttribute("titulo", "Recurso no encontrado");
-        model.addAttribute("mensaje", ex.getMessage());
-        return "error/404"; // crea templates/error/404.html
+    public ResponseEntity<?> handleResourceNotFound(ResourceNotFoundException ex) {
+        return new ResponseEntity<>(buildErrorResponse("Recurso no encontrado", ex.getMessage()), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public String handleBadRequest(BadRequestException ex, Model model) {
-        model.addAttribute("titulo", "Solicitud inválida");
-        model.addAttribute("mensaje", ex.getMessage());
-        return "error/400"; // crea templates/error/400.html
+    public ResponseEntity<?> handleBadRequest(BadRequestException ex) {
+        return new ResponseEntity<>(buildErrorResponse("Solicitud inválida", ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidationErrors(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+        );
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("error", "Errores de validación");
+        response.put("details", errors);
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
-    public String handleGeneral(Exception ex, Model model) {
-        model.addAttribute("titulo", "Error interno");
-        model.addAttribute("mensaje", "Ocurrió un error inesperado.");
-        model.addAttribute("detalle", ex.getMessage());
-        return "error/500"; // crea templates/error/500.html
+    public ResponseEntity<?> handleGeneral(Exception ex) {
+        return new ResponseEntity<>(buildErrorResponse("Error interno", ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private Map<String, Object> buildErrorResponse(String error, String message) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("error", error);
+        response.put("message", message);
+        return response;
     }
 }
