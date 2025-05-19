@@ -2,6 +2,7 @@ package com.alkemy.wallet.alkywallet.controller;
 
 import com.alkemy.wallet.alkywallet.dto.CuentaDTO;
 import com.alkemy.wallet.alkywallet.dto.CuentaRequestDTO;
+import com.alkemy.wallet.alkywallet.dto.ResumenCuentaDTO;
 import com.alkemy.wallet.alkywallet.service.ICuentaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -103,4 +104,11 @@ public class CuentaController {
         CuentaDTO actualizada = cuentaService.cambiarTipoCuenta(id, nuevoTipo);
         return ResponseEntity.ok(actualizada);
     }
+
+    @Operation(summary = "Obtener resumen de transacciones de una cuenta")
+    @GetMapping("/{id}/resumen")
+    public ResponseEntity<ResumenCuentaDTO> obtenerResumenCuenta(@PathVariable Long id) {
+        return ResponseEntity.ok(cuentaService.obtenerResumenCuenta(id));
+    }
+
 }
