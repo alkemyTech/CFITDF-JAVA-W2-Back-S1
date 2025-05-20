@@ -56,4 +56,15 @@ public class UsuarioController {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuarioActualizado) {
+        try {
+            UsuarioDTO usuarioActualizadoDTO = usuarioService.actualizarUsuario(id, usuarioActualizado);
+            return new ResponseEntity<>(usuarioActualizadoDTO, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>("No se encontró un usuario con el ID: " + id, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al actualizar el usuario.", HttpStatus.BAD_REQUEST);
+        }
+    }
 }

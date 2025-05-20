@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public interface IusuarioService {
     Usuario registrarUsuario(Usuario usuario);
+    UsuarioDTO actualizarUsuario(Long id, Usuario usuarioActualizado);
     void eliminarUsuario(@NotBlank Long id);
     UsuarioDTO buscarUsuarioPorId(@NotBlank Long id);
     UsuarioDTO buscarUsuarioPorEmail(@NotBlank String email);

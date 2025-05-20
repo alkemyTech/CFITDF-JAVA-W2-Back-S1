@@ -24,6 +24,30 @@ public class UsuarioServiceImpl implements IusuarioService{
     }
 
     @Override
+    public UsuarioDTO actualizarUsuario(Long id, Usuario usuarioActualizado) {
+        // Busca el usuario existente
+        Usuario usuarioExistente = usuarioRepository.findByIdAndBorradoFalse(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + id));
+
+        // Actualiza los campos del usuario existente
+        usuarioExistente.setNombre(usuarioActualizado.getNombre());
+        usuarioExistente.setApellido(usuarioActualizado.getApellido());
+        usuarioExistente.setEmail(usuarioActualizado.getEmail());
+
+        // Si se proporciona una nueva contraseña, codifícala y actualízala
+        if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().isEmpty()) {
+            usuarioExistente.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));
+        }
+
+        // Guarda el usuario actualizado
+        Usuario usuarioGuardado = usuarioRepository.save(usuarioExistente);
+
+        // Convierte y devuelve el DTO del usuario actualizado
+        return convertirADTO(usuarioGuardado);
+    }
+
+
+    @Override
     public void eliminarUsuario(Long id) {
         Usuario usuario = usuarioRepository.findByIdAndBorradoFalse(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + id));
