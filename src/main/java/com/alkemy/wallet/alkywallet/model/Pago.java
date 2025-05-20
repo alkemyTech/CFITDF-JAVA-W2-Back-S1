@@ -1,5 +1,6 @@
 package com.alkemy.wallet.alkywallet.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,6 +9,8 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,11 +28,12 @@ public class Pago {
 
     private String comercio;
 
-    @Temporal(TemporalType.DATE)
-    private LocalDate fecha;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date fecha;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cuenta_id", nullable = false)
+    @JsonIgnore
     private Cuenta cuenta;
 
     @Override

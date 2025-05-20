@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PagoRepository extends JpaRepository<Pago, Long> {
+public interface IPagoRepository extends JpaRepository<Pago, Long> {
 
     // Buscar todos los pagos de una cuenta específica
     List<Pago> findByCuentaId(Long cuentaId);
