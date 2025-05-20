@@ -2,6 +2,7 @@ package com.alkemy.wallet.alkywallet.service;
 
 import com.alkemy.wallet.alkywallet.dto.CuentaDTO;
 import com.alkemy.wallet.alkywallet.dto.CuentaRequestDTO;
+import com.alkemy.wallet.alkywallet.dto.ResumenCuentaDTO;
 
 import java.util.List;
 
@@ -27,4 +28,7 @@ public interface ICuentaService {
 
     // 🔄 Extra: cambiar tipo de cuenta (opcional)
     CuentaDTO cambiarTipoCuenta(Long id, String nuevoTipo);
+
+    ResumenCuentaDTO obtenerResumenCuenta(Long cuentaId);
+
 }
