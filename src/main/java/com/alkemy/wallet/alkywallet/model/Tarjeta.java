@@ -1,5 +1,6 @@
 package com.alkemy.wallet.alkywallet.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -44,7 +45,13 @@ public class Tarjeta {
 
     @ManyToOne
     @JoinColumn(name = "cuenta_id")
+    @JsonIgnore // Ignorar esta propiedad al serializar
     private Cuenta cuenta;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    @JsonIgnore // Ignorar esta propiedad al serializar
+    private Usuario usuario;
 
     @OneToMany(mappedBy = "tarjeta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transaccion> transacciones = new ArrayList<>();

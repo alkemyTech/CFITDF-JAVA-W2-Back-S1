@@ -8,8 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
-public class UsuarioServiceImpl implements IusuarioService{
+public class UsuarioServiceImpl implements IUsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -56,9 +59,7 @@ public class UsuarioServiceImpl implements IusuarioService{
         usuarioRepository.save(usuario);
     }
 
-
-    @Override
-    public UsuarioDTO buscarUsuarioPorId(Long id) {
+    public UsuarioDTO buscarUsuPorId(Long id) {
         // Verifica si el usuario existe y no está borrado
         return usuarioRepository.findByIdAndBorradoFalse(id)
                 .map(this::convertirADTO) // Convierte a DTO si se encuentra
@@ -66,8 +67,24 @@ public class UsuarioServiceImpl implements IusuarioService{
     }
 
     @Override
+    public List<UsuarioDTO> listarUsuarios() {
+        // Obtiene solo los usuarios que no están borrados
+        List<Usuario> usuarios = usuarioRepository.findByBorradoFalse();
+        return usuarios.stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public UsuarioDTO buscarUsuarioPorId(Long id) {
+        // Verifica si el usuario existe y no está borrado, incluyendo cuentas
+        return usuarioRepository.findByIdAndBorradoFalse(id)
+                .map(this::convertirADTO) // Convierte a DTO si se encuentra
+                .orElseThrow(() -> new EntityNotFoundException("No se encontró un usuario con el ID: " + id)); // Lanza excepción si no se encuentra
+    }
+
+    @Override
     public UsuarioDTO buscarUsuarioPorEmail(String email) {
-        // Verifica si el usuario existe y no está borrado
         return usuarioRepository.findByEmailAndBorradoFalse(email)
                 .map(this::convertirADTO) // Convierte a DTO si se encuentra
                 .orElseThrow(() -> new EntityNotFoundException("No se encontró un usuario con el email: " + email)); // Lanza excepción si no se encuentra
@@ -79,6 +96,8 @@ public class UsuarioServiceImpl implements IusuarioService{
         dto.setNombre(usuario.getNombre());
         dto.setApellido(usuario.getApellido());
         dto.setEmail(usuario.getEmail());
+        dto.setCuentas(usuario.getCuentas());
+        dto.setTarjetas(usuario.getTarjetas());
         return dto;
     }
 }

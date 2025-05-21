@@ -9,8 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/usuario")
+@RequestMapping("api/usuario")
 public class UsuarioController {
     @Autowired
     private UsuarioServiceImpl usuarioService;
@@ -34,6 +36,12 @@ public class UsuarioController {
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>("No se encontró un usuario con el ID: " + id, HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/listado")
+    public ResponseEntity<List<UsuarioDTO>> listarUsuarios() {
+        List<UsuarioDTO> usuarios = usuarioService.listarUsuarios(); // Llama al servicio para obtener la lista
+        return ResponseEntity.ok(usuarios); // Retorna la lista con un código de estado 200 OK
     }
 
     @GetMapping("/email/{email}")
