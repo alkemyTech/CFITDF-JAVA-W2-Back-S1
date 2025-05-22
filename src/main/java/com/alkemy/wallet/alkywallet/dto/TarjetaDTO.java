@@ -27,6 +27,7 @@ public class TarjetaDTO {
     }
 
     private CuentaDTO cuentaDTO;
+    private UsuarioDTO usuarioDTO;
 
     private List<TransaccionDTO> transaccionesDTO = new ArrayList<>();
 }

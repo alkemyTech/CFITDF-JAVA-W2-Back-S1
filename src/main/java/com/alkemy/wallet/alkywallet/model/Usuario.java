@@ -34,6 +34,9 @@ public class Usuario {
     //Relacion uno a muchos
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Cuenta> cuentas = new ArrayList<>();
+    //Relacion uno a muchos con Tarjeta
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Tarjeta> tarjetas = new ArrayList<>();
     // Inicialización por defecto
     @Enumerated(EnumType.STRING)
     private ROL rol = ROL.CLIENTE; // Valor por defecto

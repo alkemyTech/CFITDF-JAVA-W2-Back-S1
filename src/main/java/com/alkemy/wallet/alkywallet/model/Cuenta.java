@@ -1,6 +1,7 @@
 package com.alkemy.wallet.alkywallet.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -34,6 +35,7 @@ public class Cuenta {
         @NotNull(message = "La cuenta debe estar asociada a un usuario")
         @ManyToOne
         @JoinColumn(name = "usuario_id", nullable = false)
+        @JsonIgnore // Ignorar esta propiedad al serializar
         private Usuario usuario;
 
         // Unidireccional hacia Transaccion
