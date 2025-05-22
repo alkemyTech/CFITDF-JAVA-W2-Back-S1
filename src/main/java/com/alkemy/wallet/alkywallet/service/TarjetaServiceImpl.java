@@ -22,11 +22,14 @@ public class TarjetaServiceImpl implements ITarjetaService{
     //Crear tarjeta - CREATE
     @Override
     public TarjetaDTO crearTarjeta(TarjetaDTO dto) {
-        Tarjeta tarjeta = new Tarjeta();
+        if (dto.getCuentaDtoId() == null) {
+            throw new IllegalArgumentException("El ID de la cuenta no puede ser nulo");
+        }
         Cuenta cuenta = cuentaRepository.findById(dto.getCuentaDtoId()).
                 orElseThrow(() -> {
                     return new RuntimeException("No se encontro la cuenta");
                 });
+        Tarjeta tarjeta = new Tarjeta();
         actualizarCamposDesdeDTO(dto, tarjeta);
         tarjetaRepository.save(tarjeta);
         return new TarjetaDTO(tarjeta);
@@ -35,7 +38,7 @@ public class TarjetaServiceImpl implements ITarjetaService{
     // Listar todas las tarjetas con el atributo delete = false - READ
     @Override
     public List<TarjetaDTO> listarTarjetas() {
-        List<TarjetaDTO> tarjetas = tarjetaRepository.findByDeleteFalse()
+        List<TarjetaDTO> tarjetas = tarjetaRepository.findByDeletedFalse()
                 .stream()
                 .map(TarjetaDTO::new)
                 .collect(Collectors.toList());
@@ -48,7 +51,7 @@ public class TarjetaServiceImpl implements ITarjetaService{
     //Listar tarjeta por id - READ
     @Override
     public TarjetaDTO listarTarjetaPorId(Long id) {
-        Tarjeta tarjeta = tarjetaRepository.findByIdAndDeleteFalse(id)
+        Tarjeta tarjeta = tarjetaRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() ->
                 new RuntimeException("No se encontro la tarjeta con el id "+id));
         return new TarjetaDTO(tarjeta);
@@ -71,7 +74,7 @@ public class TarjetaServiceImpl implements ITarjetaService{
             .orElseThrow(() -> {
                return new RuntimeException("No se encontro la tarjeta con el id " +id);
             });
-        tarjeta.setDelete(true);
+        tarjeta.setDeleted(true);
         tarjetaRepository.save(tarjeta);
     }
 
@@ -89,8 +92,13 @@ public class TarjetaServiceImpl implements ITarjetaService{
         if (dto.getEsVirtual() != null) {
             tarjeta.setEsVirtual(dto.getEsVirtual());
         }
-        if (dto.getDelete() != null) {
-            tarjeta.setDelete(dto.getDelete());
+        if (dto.getDeleted() != null) {
+            tarjeta.setDeleted(dto.getDeleted());
+        }
+        if (dto.getCuentaDtoId() != null) {
+            Cuenta cuenta = cuentaRepository.findById(dto.getCuentaDtoId())
+                    .orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
+            tarjeta.setCuenta(cuenta);
         }
     }
 

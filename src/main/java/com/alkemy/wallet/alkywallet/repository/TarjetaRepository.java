@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface TarjetaRepository extends JpaRepository<Tarjeta, Long> {
-    public Optional<Tarjeta> findByIdAndDeleteFalse(Long id);
-    public List<Tarjeta> findByDeleteFalse();
+    public Optional<Tarjeta> findByIdAndDeletedFalse(Long id);
+    public List<Tarjeta> findByDeletedFalse();
 
 }
