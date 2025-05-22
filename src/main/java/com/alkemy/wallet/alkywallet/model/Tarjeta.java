@@ -4,11 +4,14 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -57,11 +60,17 @@ public class Tarjeta {
 	@Column(nullable = false)
 	private Boolean deleted = false;
 
-	@ManyToOne
-	@JoinColumn(name = "cuenta")
-	private Cuenta cuenta;
-
 	@OneToMany(mappedBy = "tarjeta", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Transaccion> transacciones = new ArrayList<>();
+
+	@ManyToOne
+	@JoinColumn(name = "cuenta_id")
+	@JsonIgnore // Ignorar esta propiedad al serializar
+	private Cuenta cuenta;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "usuario_id")
+	@JsonIgnore // Ignorar esta propiedad al serializar
+	private Usuario usuario;
 
 }

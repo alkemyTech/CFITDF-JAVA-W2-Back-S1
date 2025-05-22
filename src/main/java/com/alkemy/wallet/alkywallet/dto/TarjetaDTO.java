@@ -42,4 +42,7 @@ public class TarjetaDTO {
 		this.transaccionesDTO = tarjeta.getTransacciones();
 	}
 
+	private CuentaDTO cuentaDTO;
+	private UsuarioDTO usuarioDTO;
+
 }
