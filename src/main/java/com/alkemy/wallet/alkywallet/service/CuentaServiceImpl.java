@@ -2,10 +2,12 @@ package com.alkemy.wallet.alkywallet.service;
 
 import com.alkemy.wallet.alkywallet.dto.CuentaDTO;
 import com.alkemy.wallet.alkywallet.dto.CuentaRequestDTO;
+import com.alkemy.wallet.alkywallet.dto.ResumenCuentaDTO;
 import com.alkemy.wallet.alkywallet.exception.BadRequestException;
 import com.alkemy.wallet.alkywallet.exception.ResourceNotFoundException;
 import com.alkemy.wallet.alkywallet.model.Cuenta;
 import com.alkemy.wallet.alkywallet.model.TipoCuenta;
+import com.alkemy.wallet.alkywallet.model.Transaccion;
 import com.alkemy.wallet.alkywallet.model.Usuario;
 import com.alkemy.wallet.alkywallet.repository.ICuentaRepository;
 import com.alkemy.wallet.alkywallet.repository.UsuarioRepository;
@@ -14,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -164,6 +167,41 @@ public class CuentaServiceImpl implements ICuentaService {
 
         return new CuentaDTO(actualizada);
     }
+
+    public ResumenCuentaDTO obtenerResumenCuenta(Long cuentaId) {
+        Cuenta cuenta = cuentaRepository.findById(cuentaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cuenta no encontrada con ID: " + cuentaId));
+
+        List<Transaccion> transacciones = cuenta.getTransacciones();
+
+        double depositado = 0, extraido = 0, transferido = 0, pagado = 0;
+        LocalDate ultimaFecha = null;
+
+        for (Transaccion t : transacciones) {
+            switch (t.getTipoTransaccion()) {
+                case DEPOSITO -> depositado += t.getMonto();
+                case EXTRACCION -> extraido += t.getMonto();
+                case TRANSFERENCIA -> transferido += t.getMonto();
+                case PAGO -> pagado += t.getMonto();
+            }
+            if (ultimaFecha == null || t.getFecha().isAfter(ultimaFecha)) {
+                ultimaFecha = t.getFecha();
+            }
+        }
+
+        ResumenCuentaDTO resumen = new ResumenCuentaDTO();
+        resumen.setCuentaId(cuenta.getId());
+        resumen.setSaldoActual(cuenta.getSaldo());
+        resumen.setTotalDepositado(depositado);
+        resumen.setTotalExtraido(extraido);
+        resumen.setTotalTransferido(transferido);
+        resumen.setTotalPagado(pagado);
+        resumen.setCantidadTransacciones(transacciones.size());
+        resumen.setFechaUltimaTransaccion(ultimaFecha);
+
+        return resumen;
+    }
+
 
     // ---------- Métodos auxiliares ----------
 

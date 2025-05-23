@@ -13,7 +13,7 @@ public interface ICuentaRepository extends JpaRepository<Cuenta, Long> {
     // Buscar todas las cuentas de un usuario específico
     List<Cuenta> findByUsuario(Usuario usuario);
 
-    // Buscar por tipo de cuenta y usuario (útil si querés evitar cuentas duplicadas por tipo)
+    // Buscar por tipo de cuenta y usuario 
     Cuenta findByUsuarioAndTipo(Usuario usuario, Enum tipo);
 
     // Buscar todas las cuentas que no están marcadas como eliminadas
