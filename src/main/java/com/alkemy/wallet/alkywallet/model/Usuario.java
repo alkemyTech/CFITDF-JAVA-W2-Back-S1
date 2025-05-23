@@ -18,18 +18,18 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
+    @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
-    @NotBlank
+    @NotBlank(message = "El nombre es obligatorio")
     private String apellido;
-    @NotBlank
+    @NotBlank(message = "El nombre es obligatorio")
     private String email;
-    @NotBlank
+    @NotBlank(message = "El nombre es obligatorio")
     private String password;
-    private boolean accountNonLocked;
-    private boolean accountNonExpired;
-    private boolean credentialsNonExpired;
-    private boolean enabled;
+    private boolean accountNonLocked = true;
+    private boolean accountNonExpired = true;
+    private boolean credentialsNonExpired = true;
+    private boolean enabled = true;
     private boolean borrado;
     //Relacion uno a muchos
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -37,7 +37,6 @@ public class Usuario {
     //Relacion uno a muchos con Tarjeta
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tarjeta> tarjetas = new ArrayList<>();
-    // Inicialización por defecto
     @Enumerated(EnumType.STRING)
-    private ROL rol = ROL.CLIENTE; // Valor por defecto
+    private Rol rol = Rol.CLIENTE; // Valor por defecto
 }
