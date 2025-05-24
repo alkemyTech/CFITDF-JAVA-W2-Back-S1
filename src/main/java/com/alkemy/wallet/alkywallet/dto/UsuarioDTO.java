@@ -21,5 +21,4 @@ public class UsuarioDTO {
     private String apellido;
     private String email;
     private List<Cuenta> cuentas = new ArrayList<>();
-    private List<Tarjeta> tarjetas = new ArrayList<>();
 }
