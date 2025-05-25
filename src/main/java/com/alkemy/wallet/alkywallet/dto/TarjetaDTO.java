@@ -26,7 +26,7 @@ public class TarjetaDTO {
 	}
 
 	private Long cuentaDtoId;
-
+	private UsuarioDTO usuarioDTO;
 	private List<Transaccion> transaccionesDTO = new ArrayList<>();
 
 	public TarjetaDTO() {
@@ -39,10 +39,15 @@ public class TarjetaDTO {
 		this.fechaExpiracion = tarjeta.getFechaExpiracion();
 		this.esVirtual = tarjeta.getEsVirtual();
 		this.cuentaDtoId = tarjeta.getCuenta().getId();
-		this.transaccionesDTO = tarjeta.getTransacciones();
+		if (tarjeta.getUsuario() != null) {
+			UsuarioDTO usuarioDto = new UsuarioDTO();
+			usuarioDto.setNombre(tarjeta.getUsuario().getNombre());
+			usuarioDto.setApellido(tarjeta.getUsuario().getApellido());
+			this.usuarioDTO = usuarioDto;
+		} else {
+			this.usuarioDTO = null;
+		}
+		this.transaccionesDTO = tarjeta.getTransacciones() != null ? tarjeta.getTransacciones() : new ArrayList<>();
 	}
-
-	private CuentaDTO cuentaDTO;
-	private UsuarioDTO usuarioDTO;
 
 }
