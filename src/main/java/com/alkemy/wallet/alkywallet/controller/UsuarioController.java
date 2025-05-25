@@ -1,78 +1,112 @@
 package com.alkemy.wallet.alkywallet.controller;
 
-import com.alkemy.wallet.alkywallet.dto.UsuarioDTO;
-import com.alkemy.wallet.alkywallet.model.Usuario;
-import com.alkemy.wallet.alkywallet.service.UsuarioServiceImpl;
-import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.alkemy.wallet.alkywallet.dto.UsuarioDTO;
+import com.alkemy.wallet.alkywallet.model.Usuario;
+import com.alkemy.wallet.alkywallet.service.UsuarioServiceImpl;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
+
+@Tag(name = "Usuarios", description = "Operaciones sobre usuarios")
 @RestController
 @RequestMapping("api/usuario")
 public class UsuarioController {
-    @Autowired
-    private UsuarioServiceImpl usuarioService;
+	@Autowired
+	private UsuarioServiceImpl usuarioService;
 
-    @PostMapping("/registro")
-    public ResponseEntity<UsuarioDTO> registrarUsuario(@RequestBody Usuario usuario) {
-        try {
-            Usuario usuarioRegistrado = usuarioService.registrarUsuario(usuario);
-            UsuarioDTO dto = usuarioService.convertirADTO(usuarioRegistrado);
-            return new ResponseEntity<>(dto, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
+	@PostMapping("/registro")
+	@Operation(summary = "Registrar un nuevo usuario", responses = {
+			@ApiResponse(responseCode = "201", description = "Usuario registrado exitosamente"),
+			@ApiResponse(responseCode = "400", description = "Error en la solicitud") })
+	public ResponseEntity<UsuarioDTO> registrarUsuario(@RequestBody Usuario usuario) {
+		try {
+			Usuario usuarioRegistrado = usuarioService.registrarUsuario(usuario);
+			UsuarioDTO dto = usuarioService.convertirADTO(usuarioRegistrado);
+			return new ResponseEntity<>(dto, HttpStatus.CREATED);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> obtenerUsuarioPorId(@PathVariable Long id) {
-        try {
-            UsuarioDTO usuario = usuarioService.buscarUsuarioPorId(id);
-            return new ResponseEntity<>(usuario, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>("No se encontró un usuario con el ID: " + id, HttpStatus.NOT_FOUND);
-        }
-    }
+	@GetMapping("/{id}")
+	@Operation(summary = "Obtener usuario por ID", responses = {
+			@ApiResponse(responseCode = "200", description = "Usuario encontrado"),
+			@ApiResponse(responseCode = "404", description = "Usuario no encontrado") })
+	public ResponseEntity<?> obtenerUsuarioPorId(@Parameter(description = "ID del usuario") @PathVariable Long id) {
+		try {
+			UsuarioDTO usuario = usuarioService.buscarUsuarioPorId(id);
+			return new ResponseEntity<>(usuario, HttpStatus.OK);
+		} catch (EntityNotFoundException e) {
+			return new ResponseEntity<>("No se encontró un usuario con el ID: " + id, HttpStatus.NOT_FOUND);
+		}
+	}
 
-    @GetMapping("/listado")
-    public ResponseEntity<List<UsuarioDTO>> listarUsuarios() {
-        List<UsuarioDTO> usuarios = usuarioService.listarUsuarios(); // Llama al servicio para obtener la lista
-        return ResponseEntity.ok(usuarios); // Retorna la lista con un código de estado 200 OK
-    }
+	@GetMapping("/listado")
+	@Operation(summary = "Listar todos los usuarios", responses = {
+			@ApiResponse(responseCode = "200", description = "Lista de usuarios") })
+	public ResponseEntity<List<UsuarioDTO>> listarUsuarios() {
+		List<UsuarioDTO> usuarios = usuarioService.listarUsuarios();
+		return ResponseEntity.ok(usuarios);
+	}
 
-    @GetMapping("/email/{email}")
-    public ResponseEntity<?> obtenerUsuarioPorEmail(@PathVariable String email) {
-        try {
-            UsuarioDTO usuario = usuarioService.buscarUsuarioPorEmail(email);
-            return new ResponseEntity<>(usuario, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>("No se encontró un usuario con el email: " + email, HttpStatus.NOT_FOUND);
-        }
-    }
+	@GetMapping("/email/{email}")
+	@Operation(summary = "Obtener usuario por email", responses = {
+			@ApiResponse(responseCode = "200", description = "Usuario encontrado"),
+			@ApiResponse(responseCode = "404", description = "Usuario no encontrado") })
+	public ResponseEntity<?> obtenerUsuarioPorEmail(
+			@Parameter(description = "Email del usuario") @PathVariable String email) {
+		try {
+			UsuarioDTO usuario = usuarioService.buscarUsuarioPorEmail(email);
+			return new ResponseEntity<>(usuario, HttpStatus.OK);
+		} catch (EntityNotFoundException e) {
+			return new ResponseEntity<>("No se encontró un usuario con el email: " + email, HttpStatus.NOT_FOUND);
+		}
+	}
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminarUsuario(@PathVariable Long id) {
-        try {
-            usuarioService.eliminarUsuario(id);
-            return new ResponseEntity<>("Usuario eliminado correctamente.", HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>("No se encontró un usuario con el ID: " + id, HttpStatus.NOT_FOUND);
-        }
-    }
+	@DeleteMapping("/{id}")
+	@Operation(summary = "Eliminar un usuario por ID", responses = {
+			@ApiResponse(responseCode = "200", description = "Usuario eliminado correctamente"),
+			@ApiResponse(responseCode = "404", description = "Usuario no encontrado") })
+	public ResponseEntity<String> eliminarUsuario(@Parameter(description = "ID del usuario") @PathVariable Long id) {
+		try {
+			usuarioService.eliminarUsuario(id);
+			return new ResponseEntity<>("Usuario eliminado correctamente.", HttpStatus.OK);
+		} catch (EntityNotFoundException e) {
+			return new ResponseEntity<>("No se encontró un usuario con el ID: " + id, HttpStatus.NOT_FOUND);
+		}
+	}
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuarioActualizado) {
-        try {
-            UsuarioDTO usuarioActualizadoDTO = usuarioService.actualizarUsuario(id, usuarioActualizado);
-            return new ResponseEntity<>(usuarioActualizadoDTO, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>("No se encontró un usuario con el ID: " + id, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error al actualizar el usuario.", HttpStatus.BAD_REQUEST);
-        }
-    }
+	@PutMapping("/{id}")
+	@Operation(summary = "Actualizar un usuario por ID", responses = {
+			@ApiResponse(responseCode = "200", description = "Usuario actualizado"),
+			@ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+			@ApiResponse(responseCode = "400", description = "Error en la actualización") })
+	public ResponseEntity<?> actualizarUsuario(@Parameter(description = "ID del usuario") @PathVariable Long id,
+			@RequestBody Usuario usuarioActualizado) {
+		try {
+			UsuarioDTO usuarioActualizadoDTO = usuarioService.actualizarUsuario(id, usuarioActualizado);
+			return new ResponseEntity<>(usuarioActualizadoDTO, HttpStatus.OK);
+		} catch (EntityNotFoundException e) {
+			return new ResponseEntity<>("No se encontró un usuario con el ID: " + id, HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			return new ResponseEntity<>("Error al actualizar el usuario.", HttpStatus.BAD_REQUEST);
+		}
+	}
 }
