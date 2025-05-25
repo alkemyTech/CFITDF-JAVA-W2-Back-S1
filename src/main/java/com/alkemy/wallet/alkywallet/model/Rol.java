@@ -1,6 +1,6 @@
 package com.alkemy.wallet.alkywallet.model;
 
-public enum ROL {
+public enum Rol {
     CLIENTE,
     ADMIN
 }
