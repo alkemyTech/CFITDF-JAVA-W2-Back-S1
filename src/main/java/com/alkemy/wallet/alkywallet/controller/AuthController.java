@@ -1,5 +1,6 @@
 package com.alkemy.wallet.alkywallet.controller;
 
+import com.alkemy.wallet.alkywallet.dto.AuthResponse;
 import com.alkemy.wallet.alkywallet.dto.LoginDTO;
 import com.alkemy.wallet.alkywallet.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,14 +28,16 @@ public class AuthController {
 
     @Operation(summary = "Iniciar sesión", description = "Autenticación de usuario mediante credenciales")
     @PostMapping("/login")
-    public ResponseEntity<String> login(
+    public ResponseEntity<AuthResponse> login(
             @Parameter(description = "Objeto que contiene las credenciales de inicio de sesión")
             @RequestBody LoginDTO loginDTO) {
 
         if (authService.authenticate(loginDTO)) {
-            return ResponseEntity.ok("Inicio de sesión exitoso");
+            AuthResponse response = new AuthResponse("success", "Inicio de sesión exitoso");
+            return ResponseEntity.ok(response);
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
+            AuthResponse response = new AuthResponse("error", "Credenciales inválidas");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
 }
