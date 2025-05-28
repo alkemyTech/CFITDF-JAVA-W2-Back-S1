@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alkemy.wallet.alkywallet.dto.TarjetaDTO;
 import com.alkemy.wallet.alkywallet.model.Cuenta;
@@ -22,6 +23,7 @@ public class TarjetaServiceImpl implements ITarjetaService {
 
 	// Crear tarjeta - CREATE
 	@Override
+	@Transactional
 	public TarjetaDTO crearTarjeta(TarjetaDTO dto) {
 		if (dto.getCuentaDtoId() == null) {
 			throw new IllegalArgumentException("El ID de la cuenta no puede ser nulo");
@@ -68,6 +70,7 @@ public class TarjetaServiceImpl implements ITarjetaService {
 
 	// Editar tarjeta por id - UPDATE
 	@Override
+	@Transactional
 	public TarjetaDTO editarTarjeta(Long id, TarjetaDTO dto) {
 		Tarjeta tarjeta = tarjetaRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("No se encontro la tarjeta con el id " + id));
