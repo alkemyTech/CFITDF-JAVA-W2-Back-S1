@@ -97,6 +97,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
         dto.setApellido(usuario.getApellido());
         dto.setEmail(usuario.getEmail());
         dto.setCuentas(usuario.getCuentas());
+        dto.setRol(usuario.getRol());
         return dto;
     }
 }
