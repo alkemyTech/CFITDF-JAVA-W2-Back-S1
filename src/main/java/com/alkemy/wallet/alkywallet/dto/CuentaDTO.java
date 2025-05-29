@@ -6,20 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-<<<<<<< HEAD
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-public class CuentaDTO {
-
-    private Long id;
-    private Double saldo;
-    private String tipo;         // Descripción legible
-    private Long usuarioId;
-    private boolean deleted;
-
-=======
 @Getter
 @Setter
 @NoArgsConstructor
@@ -39,5 +25,4 @@ public class CuentaDTO {
         this.nombreUsuario = cuenta.getUsuario().getNombre();
         this.apellidoUsuario = cuenta.getUsuario().getApellido();
     }
->>>>>>> dev
 }
