@@ -1,6 +1,7 @@
 package com.alkemy.wallet.alkywallet.dto;
 
 import com.alkemy.wallet.alkywallet.model.Cuenta;
+import com.alkemy.wallet.alkywallet.model.Rol;
 import com.alkemy.wallet.alkywallet.model.Tarjeta;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -21,4 +22,5 @@ public class UsuarioDTO {
     private String apellido;
     private String email;
     private List<Cuenta> cuentas = new ArrayList<>();
+    private Rol rol = Rol.CLIENTE;
 }
