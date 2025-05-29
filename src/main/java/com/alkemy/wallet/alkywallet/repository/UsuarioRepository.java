@@ -13,5 +13,6 @@ import java.util.Optional;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByIdAndBorradoFalse(Long id);
     Optional<Usuario> findByEmailAndBorradoFalse(String email);
+    boolean existsByEmailAndBorradoFalse(String email);
     List<Usuario> findByBorradoFalse();
 }
