@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+<<<<<<< HEAD
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -18,4 +19,25 @@ public class CuentaDTO {
     private Long usuarioId;
     private boolean deleted;
 
+=======
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class CuentaDTO {
+
+    private Long id;                      // Lo mantenemos para futuras operaciones
+    private Double saldo;
+    private String tipo;                  // Descripción legible del enum
+    private String nombreUsuario;
+    private String apellidoUsuario;
+
+    public CuentaDTO(Cuenta cuenta) {
+        this.id = cuenta.getId();
+        this.saldo = cuenta.getSaldo();
+        this.tipo = cuenta.getTipo().getDescripcion();
+        this.nombreUsuario = cuenta.getUsuario().getNombre();
+        this.apellidoUsuario = cuenta.getUsuario().getApellido();
+    }
+>>>>>>> dev
 }

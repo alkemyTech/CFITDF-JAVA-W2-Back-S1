@@ -1,6 +1,7 @@
 package com.alkemy.wallet.alkywallet.model;
 
 public enum TipoTransaccion {
+<<<<<<< HEAD
     DEPOSITO("Depósito"),
     EXTRACCION("Extracción"),
     TRANSFERENCIA("Transferencia"),
@@ -16,3 +17,10 @@ public enum TipoTransaccion {
         return descripcion;
     }
 }
+=======
+    DEPOSITO,
+    EXTRACCION,
+    TRANSFERENCIA,
+    PAGO
+}
+>>>>>>> dev
