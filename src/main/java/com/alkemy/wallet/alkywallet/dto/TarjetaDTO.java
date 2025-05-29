@@ -49,5 +49,4 @@ public class TarjetaDTO {
 		}
 		this.transaccionesDTO = tarjeta.getTransacciones() != null ? tarjeta.getTransacciones() : new ArrayList<>();
 	}
-
 }
