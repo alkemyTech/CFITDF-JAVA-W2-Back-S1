@@ -4,6 +4,7 @@ import com.alkemy.wallet.alkywallet.dto.UsuarioDTO;
 import com.alkemy.wallet.alkywallet.model.Usuario;
 import com.alkemy.wallet.alkywallet.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class UsuarioServiceImpl implements IUsuarioService {
+    private final ModelMapper modelMapper = new ModelMapper();
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -22,6 +24,11 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Override
     public Usuario registrarUsuario(Usuario usuario) {
+        // Verifica si ya existe un usuario con el mismo email
+        if (usuarioRepository.existsByEmailAndBorradoFalse(usuario.getEmail())) {
+            throw new IllegalArgumentException("Ya existe un usuario registrado con el email: " + usuario.getEmail());
+        }
+
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         return usuarioRepository.save(usuario);
     }
@@ -92,12 +99,6 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Override
     public UsuarioDTO convertirADTO(Usuario usuario) {
-        UsuarioDTO dto = new UsuarioDTO();
-        dto.setNombre(usuario.getNombre());
-        dto.setApellido(usuario.getApellido());
-        dto.setEmail(usuario.getEmail());
-        dto.setCuentas(usuario.getCuentas());
-        dto.setRol(usuario.getRol());
-        return dto;
+        return modelMapper.map(usuario, UsuarioDTO.class);
     }
 }
