@@ -1,10 +1,7 @@
 package com.alkemy.wallet.alkywallet.dto;
 
 import com.alkemy.wallet.alkywallet.model.TipoTransaccion;
-<<<<<<< HEAD
-=======
 import jakarta.persistence.*;
->>>>>>> dev
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
