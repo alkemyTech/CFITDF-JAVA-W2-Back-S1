@@ -4,6 +4,11 @@ package com.alkemy.wallet.alkywallet.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+<<<<<<< HEAD
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+=======
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,13 +21,17 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+>>>>>>> dev
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+<<<<<<< HEAD
+=======
                 .cors()
                 .and()
+>>>>>>> dev
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
@@ -32,6 +41,9 @@ public class SecurityConfig {
 
         return http.build();
     }
+<<<<<<< HEAD
+}
+=======
 
 
     // Bean para codificar contraseñas (usado al registrar usuarios)
@@ -54,3 +66,4 @@ public class SecurityConfig {
     }
 
 }
+>>>>>>> dev
