@@ -61,6 +61,7 @@ public class Tarjeta {
 	private Boolean deleted = false;
 
 	@OneToMany(mappedBy = "tarjeta", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
 	private List<Transaccion> transacciones = new ArrayList<>();
 
 	@ManyToOne

@@ -1,10 +1,13 @@
 package com.alkemy.wallet.alkywallet.service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alkemy.wallet.alkywallet.dto.TarjetaDTO;
 import com.alkemy.wallet.alkywallet.model.Cuenta;
@@ -22,6 +25,7 @@ public class TarjetaServiceImpl implements ITarjetaService {
 
 	// Crear tarjeta - CREATE
 	@Override
+	@Transactional
 	public TarjetaDTO crearTarjeta(TarjetaDTO dto) {
 		if (dto.getCuentaDtoId() == null) {
 			throw new IllegalArgumentException("El ID de la cuenta no puede ser nulo");
@@ -32,6 +36,9 @@ public class TarjetaServiceImpl implements ITarjetaService {
 
 		Tarjeta tarjeta = new Tarjeta();
 		tarjeta.setUsuario(cuenta.getUsuario());
+		tarjeta.setFechaExpiracion(LocalDate.now().plusYears(4));
+		tarjeta.setDeleted(false);
+		tarjeta.setNumero(generarNumeroTarjetaAleatorio());
 		actualizarCamposDesdeDTO(dto, tarjeta);
 		tarjetaRepository.save(tarjeta);
 		return new TarjetaDTO(tarjeta);
@@ -68,6 +75,7 @@ public class TarjetaServiceImpl implements ITarjetaService {
 
 	// Editar tarjeta por id - UPDATE
 	@Override
+	@Transactional
 	public TarjetaDTO editarTarjeta(Long id, TarjetaDTO dto) {
 		Tarjeta tarjeta = tarjetaRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("No se encontro la tarjeta con el id " + id));
@@ -87,15 +95,11 @@ public class TarjetaServiceImpl implements ITarjetaService {
 	}
 
 	private void actualizarCamposDesdeDTO(TarjetaDTO dto, Tarjeta tarjeta) {
-		if (dto.getNumero() != null) {
-			tarjeta.setNumero(dto.getNumero());
-		}
+
 		if (dto.getTipo() != null) {
 			tarjeta.setTipo(dto.getTipo());
 		}
-		if (dto.getFechaExpiracion() != null) {
-			tarjeta.setFechaExpiracion(dto.getFechaExpiracion());
-		}
+
 		if (dto.getEsVirtual() != null) {
 			tarjeta.setEsVirtual(dto.getEsVirtual());
 		}
@@ -104,7 +108,15 @@ public class TarjetaServiceImpl implements ITarjetaService {
 					.orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
 			tarjeta.setCuenta(cuenta);
 		}
-		tarjeta.setDeleted(false);
+	}
+
+	private String generarNumeroTarjetaAleatorio() {
+		StringBuilder numero = new StringBuilder();
+		Random random = new Random();
+		for (int i = 0; i < 12; i++) {
+			numero.append(random.nextInt(10));
+		}
+		return numero.toString();
 	}
 
 }
