@@ -1,24 +1,23 @@
 package com.alkemy.wallet.alkywallet.dto;
 
 import com.alkemy.wallet.alkywallet.model.Cuenta;
-<<<<<<< HEAD
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
-=======
+
+import com.alkemy.wallet.alkywallet.model.Rol;
 import com.alkemy.wallet.alkywallet.model.Tarjeta;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
->>>>>>> dev
+
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-<<<<<<< HEAD
 @Getter
 @Setter
 public class UsuarioDTO {
@@ -49,7 +48,7 @@ public class UsuarioDTO {
         this.enabled = enabled;
         this.cuentas = cuentas;
     }
-=======
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -59,5 +58,8 @@ public class UsuarioDTO {
     private String apellido;
     private String email;
     private List<Cuenta> cuentas = new ArrayList<>();
->>>>>>> dev
+
+
+    private Rol rol = Rol.CLIENTE;
+
 }
