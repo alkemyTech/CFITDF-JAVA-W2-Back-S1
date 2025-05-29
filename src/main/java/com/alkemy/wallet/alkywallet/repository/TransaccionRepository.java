@@ -17,10 +17,4 @@ public interface TransaccionRepository extends JpaRepository<Transaccion, Long> 
 
     // Listar transacciones por tarjeta
     List<Transaccion> findByTarjetaId(Long tarjetaId);
-
-import com.alkemy.wallet.alkywallet.model.Transaccion;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface TransaccionRepository extends JpaRepository <Transaccion, Long>{
-
 }

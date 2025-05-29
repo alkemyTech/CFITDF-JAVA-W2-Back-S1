@@ -1,18 +1,10 @@
 package com.alkemy.wallet.alkywallet.dto;
 
 import com.alkemy.wallet.alkywallet.model.Cuenta;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-
 import com.alkemy.wallet.alkywallet.model.Rol;
-import com.alkemy.wallet.alkywallet.model.Tarjeta;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -20,6 +12,8 @@ import java.util.List;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UsuarioDTO {
 
     private Long id;
@@ -31,35 +25,6 @@ public class UsuarioDTO {
     private boolean accountNonExpired;
     private boolean credentialsNonExpired;
     private boolean enabled;
-    private List<Cuenta> cuentas = new ArrayList<>();
-
-    public UsuarioDTO() {
-    }
-
-    public UsuarioDTO(Long id, String nombre, String apellido, String email, String password, boolean accountNonLocked, boolean accountNonExpired, boolean credentialsNonExpired, boolean enabled, List<Cuenta> cuentas) {
-        this.id = id;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.email = email;
-        this.password = password;
-        this.accountNonLocked = accountNonLocked;
-        this.accountNonExpired = accountNonExpired;
-        this.credentialsNonExpired = credentialsNonExpired;
-        this.enabled = enabled;
-        this.cuentas = cuentas;
-    }
-
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-public class UsuarioDTO {
-    private String nombre;
-    private String apellido;
-    private String email;
-    private List<Cuenta> cuentas = new ArrayList<>();
-
-
     private Rol rol = Rol.CLIENTE;
-
+    private List<Cuenta> cuentas = new ArrayList<>();
 }
