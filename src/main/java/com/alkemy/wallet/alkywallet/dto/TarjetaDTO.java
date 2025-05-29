@@ -1,19 +1,48 @@
 package com.alkemy.wallet.alkywallet.dto;
 
+<<<<<<< HEAD
+import com.alkemy.wallet.alkywallet.model.Tarjeta;
+import lombok.Getter;
+import lombok.Setter;
+
+
+=======
+>>>>>>> dev
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+<<<<<<< HEAD
+=======
 import com.alkemy.wallet.alkywallet.model.Tarjeta;
 import com.alkemy.wallet.alkywallet.model.Transaccion;
 
 import lombok.Getter;
 import lombok.Setter;
 
+>>>>>>> dev
 @Getter
 @Setter
 public class TarjetaDTO {
 
+<<<<<<< HEAD
+    private Long id;
+    private String numero;
+    private TipoTarjeta tipo;
+    private LocalDate fechaExpiracion;
+
+    private boolean esVirtual;
+
+    public enum TipoTarjeta {
+        CREDITO,
+        DEBITO,
+        PREPAGA,
+    }
+
+    private CuentaDTO cuentaDTO;
+
+    private List<TransaccionDTO> transaccionesDTO = new ArrayList<>();
+=======
 	private Long id;
 	private String numero;
 	private Tarjeta.TipoTarjeta tipo;
@@ -50,4 +79,5 @@ public class TarjetaDTO {
 		this.transaccionesDTO = tarjeta.getTransacciones() != null ? tarjeta.getTransacciones() : new ArrayList<>();
 	}
 
+>>>>>>> dev
 }
