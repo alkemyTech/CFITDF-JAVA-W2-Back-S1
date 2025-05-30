@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,8 +38,11 @@ public class Usuario {
     private boolean accountNonLocked = true;
     private boolean accountNonExpired = true;
     private boolean credentialsNonExpired = true;
-    private boolean enabled = true;
+    private boolean activo = true;
 
+    @CreationTimestamp
+    @Temporal(TemporalType.DATE)
+    private LocalDate fechaRegistro;
     private boolean borrado = false;
 
     @Enumerated(EnumType.STRING)

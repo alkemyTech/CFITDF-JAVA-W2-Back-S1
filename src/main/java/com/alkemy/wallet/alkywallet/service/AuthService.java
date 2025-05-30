@@ -1,5 +1,6 @@
 package com.alkemy.wallet.alkywallet.service;
 
+import com.alkemy.wallet.alkywallet.dto.AuthResponse;
 import com.alkemy.wallet.alkywallet.dto.LoginDTO;
 import com.alkemy.wallet.alkywallet.model.Usuario;
 import com.alkemy.wallet.alkywallet.repository.UsuarioRepository;
@@ -18,14 +19,18 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder; // Para verificar contraseñas hasheadas
 
-    public boolean authenticate(LoginDTO loginDTO) {
+    public AuthResponse authenticate(LoginDTO loginDTO) {
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmailAndBorradoFalse(loginDTO.getEmail());
 
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
             // Verificar la contraseña hasheada
-            return passwordEncoder.matches(loginDTO.getPassword(), usuario.getPassword());
+            if (passwordEncoder.matches(loginDTO.getPassword(), usuario.getPassword())) {
+                return new AuthResponse("success", "Inicio de sesión exitoso", usuario.getRol());
+            } else {
+                return new AuthResponse("error", "Credenciales inválidas", null);
+            }
         }
-        return false;
+        return new AuthResponse("error", "Usuario no encontrado", null);
     }
 }

@@ -32,12 +32,11 @@ public class AuthController {
             @Parameter(description = "Objeto que contiene las credenciales de inicio de sesión")
             @RequestBody LoginDTO loginDTO) {
 
-        if (authService.authenticate(loginDTO)) {
-            AuthResponse response = new AuthResponse("success", "Inicio de sesión exitoso");
-            return ResponseEntity.ok(response);
+        AuthResponse authResponse = authService.authenticate(loginDTO);
+        if ("success".equals(authResponse.getStatus())) {
+            return ResponseEntity.ok(authResponse);
         } else {
-            AuthResponse response = new AuthResponse("error", "Credenciales inválidas");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authResponse);
         }
     }
 }

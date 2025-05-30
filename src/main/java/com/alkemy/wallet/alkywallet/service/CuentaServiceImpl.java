@@ -55,6 +55,22 @@ public class CuentaServiceImpl implements ICuentaService {
     }
 
     @Override
+    public Cuenta crearCuentaAutomatica(Usuario usuario) {
+        log.info("Creando cuenta automática para usuario ID: {}", usuario.getId());
+
+        Cuenta cuenta = new Cuenta();
+        cuenta.setSaldo(0.0); // Saldo inicial en cero
+        cuenta.setTipo(TipoCuenta.CAJA_AHORRO);
+        cuenta.setUsuario(usuario);
+        cuenta.setDeleted(false);
+
+        Cuenta cuentaGuardada = cuentaRepository.save(cuenta);
+        log.info("Cuenta automática creada exitosamente con ID: {}", cuentaGuardada.getId());
+
+        return cuentaGuardada;
+    }
+
+    @Override
     public CuentaDTO obtenerCuentaPorId(Long id) {
         log.info("Buscando cuenta por ID: {}", id);
 

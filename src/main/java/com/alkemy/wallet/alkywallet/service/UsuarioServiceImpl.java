@@ -4,6 +4,9 @@ import com.alkemy.wallet.alkywallet.dto.UsuarioDTO;
 import com.alkemy.wallet.alkywallet.model.Usuario;
 import com.alkemy.wallet.alkywallet.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotBlank;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UsuarioServiceImpl implements IUsuarioService {
     private final ModelMapper modelMapper = new ModelMapper();
@@ -22,7 +26,11 @@ public class UsuarioServiceImpl implements IUsuarioService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ICuentaService cuentaService;
+
     @Override
+    @Transactional // Agregar esta anotación
     public Usuario registrarUsuario(Usuario usuario) {
         // Verifica si ya existe un usuario con el mismo email
         if (usuarioRepository.existsByEmailAndBorradoFalse(usuario.getEmail())) {
@@ -30,7 +38,18 @@ public class UsuarioServiceImpl implements IUsuarioService {
         }
 
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-        return usuarioRepository.save(usuario);
+        Usuario usuarioGuardado = usuarioRepository.save(usuario);
+
+        // Crear cuenta automáticamente
+        try {
+            cuentaService.crearCuentaAutomatica(usuarioGuardado);
+            log.info("Usuario y cuenta creados exitosamente para: {}", usuario.getEmail());
+        } catch (Exception e) {
+            log.error("Error al crear cuenta automática para usuario: {} - {}",
+                    usuarioGuardado.getId(), e.getMessage());
+        }
+
+        return usuarioGuardado;
     }
 
     @Override
@@ -66,6 +85,15 @@ public class UsuarioServiceImpl implements IUsuarioService {
         usuarioRepository.save(usuario);
     }
 
+    @Override
+    public void desactivarUsuario(@NotBlank Long id){
+        Usuario usuario = usuarioRepository.findByIdAndBorradoFalse(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + id));
+
+        usuario.setActivo(false);
+        usuarioRepository.save(usuario);
+    }
+
     public UsuarioDTO buscarUsuPorId(Long id) {
         // Verifica si el usuario existe y no está borrado
         return usuarioRepository.findByIdAndBorradoFalse(id)
@@ -76,7 +104,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
     @Override
     public List<UsuarioDTO> listarUsuarios() {
         // Obtiene solo los usuarios que no están borrados
-        List<Usuario> usuarios = usuarioRepository.findByBorradoFalse();
+        List<Usuario> usuarios = usuarioRepository.findAll();
         return usuarios.stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
@@ -85,7 +113,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
     @Override
     public UsuarioDTO buscarUsuarioPorId(Long id) {
         // Verifica si el usuario existe y no está borrado, incluyendo cuentas
-        return usuarioRepository.findByIdAndBorradoFalse(id)
+        return usuarioRepository.findById(id)
                 .map(this::convertirADTO) // Convierte a DTO si se encuentra
                 .orElseThrow(() -> new EntityNotFoundException("No se encontró un usuario con el ID: " + id)); // Lanza excepción si no se encuentra
     }
