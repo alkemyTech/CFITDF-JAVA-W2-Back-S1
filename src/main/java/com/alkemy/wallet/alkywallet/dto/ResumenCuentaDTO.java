@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -21,4 +22,8 @@ public class ResumenCuentaDTO {
     private Double totalPagado;
     private Integer cantidadTransacciones;
     private LocalDate fechaUltimaTransaccion;
+
+    private String tipoUltimaTransaccion;
+    private Double montoUltimaTransaccion;
+    private String descripcionUltimaTransaccion;
 }
