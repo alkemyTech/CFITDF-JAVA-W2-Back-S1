@@ -20,7 +20,6 @@ import java.util.List;
 @RequestMapping("/api/cuentas")
 @RequiredArgsConstructor
 public class CuentaController {
-
     private final ICuentaService cuentaService;
 
     @Operation(summary = "Crear una nueva cuenta")

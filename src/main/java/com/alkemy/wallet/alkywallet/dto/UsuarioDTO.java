@@ -22,6 +22,10 @@ public class UsuarioDTO {
     private String nombre;
     private String apellido;
     private String email;
+    private String DNI;
+    private String telefono;
+    private LocalDate fechaNacimiento;
+    private String direccion;
     private Rol rol;
     @Temporal(TemporalType.DATE)
     private LocalDate fechaRegistro;
