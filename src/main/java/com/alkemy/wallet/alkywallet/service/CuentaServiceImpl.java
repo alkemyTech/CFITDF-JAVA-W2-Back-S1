@@ -10,6 +10,8 @@ import com.alkemy.wallet.alkywallet.model.TipoCuenta;
 import com.alkemy.wallet.alkywallet.model.Transaccion;
 import com.alkemy.wallet.alkywallet.model.Usuario;
 import com.alkemy.wallet.alkywallet.repository.ICuentaRepository;
+import com.alkemy.wallet.alkywallet.repository.IPagoRepository;
+import com.alkemy.wallet.alkywallet.repository.TarjetaRepository;
 import com.alkemy.wallet.alkywallet.repository.UsuarioRepository;
 import com.alkemy.wallet.alkywallet.service.ICuentaService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,12 @@ public class CuentaServiceImpl implements ICuentaService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private IPagoRepository pagoRepository;
+
+    @Autowired
+    private TarjetaRepository tarjetaRepository;
 
     @Override
     public CuentaDTO crearCuenta(CuentaRequestDTO dto) {
@@ -168,6 +176,7 @@ public class CuentaServiceImpl implements ICuentaService {
         return new CuentaDTO(actualizada);
     }
 
+    @Override
     public ResumenCuentaDTO obtenerResumenCuenta(Long cuentaId) {
         Cuenta cuenta = cuentaRepository.findById(cuentaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cuenta no encontrada con ID: " + cuentaId));
@@ -177,6 +186,10 @@ public class CuentaServiceImpl implements ICuentaService {
         double depositado = 0, extraido = 0, transferido = 0, pagado = 0;
         LocalDate ultimaFecha = null;
 
+        String tipoUltima = null;
+        Double montoUltima = null;
+        String descripcionUltima = null;
+
         for (Transaccion t : transacciones) {
             switch (t.getTipoTransaccion()) {
                 case DEPOSITO -> depositado += t.getMonto();
@@ -184,8 +197,12 @@ public class CuentaServiceImpl implements ICuentaService {
                 case TRANSFERENCIA -> transferido += t.getMonto();
                 case PAGO -> pagado += t.getMonto();
             }
+
             if (ultimaFecha == null || t.getFecha().isAfter(ultimaFecha)) {
                 ultimaFecha = t.getFecha();
+                tipoUltima = t.getTipoTransaccion().name();
+                montoUltima = t.getMonto();
+                descripcionUltima = t.getDescripcion();
             }
         }
 
@@ -198,6 +215,9 @@ public class CuentaServiceImpl implements ICuentaService {
         resumen.setTotalPagado(pagado);
         resumen.setCantidadTransacciones(transacciones.size());
         resumen.setFechaUltimaTransaccion(ultimaFecha);
+        resumen.setTipoUltimaTransaccion(tipoUltima);
+        resumen.setMontoUltimaTransaccion(montoUltima);
+        resumen.setDescripcionUltimaTransaccion(descripcionUltima);
 
         return resumen;
     }
