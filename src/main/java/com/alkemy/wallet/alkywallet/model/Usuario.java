@@ -35,14 +35,29 @@ public class Usuario {
     @NotBlank(message = "La contraseña es obligatoria")
     private String password;
 
-    private boolean accountNonLocked = true;
-    private boolean accountNonExpired = true;
-    private boolean credentialsNonExpired = true;
+    @NotBlank(message = "El DNI es obligatorio")
+    @Column(unique = true)
+    private String DNI;
+
+    @NotBlank(message = "El teléfono es obligatorio")
+    private String telefono;
+
+    @Temporal(TemporalType.DATE)
+    private LocalDate fechaNacimiento;
+
+    private String provincia;
+
+    private String ciudad;
+
+    @NotBlank(message = "La dirección es obligatoria")
+    private String direccion;
+
     private boolean activo = true;
 
     @CreationTimestamp
     @Temporal(TemporalType.DATE)
     private LocalDate fechaRegistro;
+
     private boolean borrado = false;
 
     @Enumerated(EnumType.STRING)
