@@ -8,9 +8,11 @@ import jakarta.persistence.EntityNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,14 +29,10 @@ public class UsuarioController {
             @ApiResponse(responseCode = "201", description = "Usuario registrado exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en la solicitud")
     })
-    public ResponseEntity<UsuarioDTO> registrarUsuario(@RequestBody Usuario usuario) {
-        try {
-            Usuario usuarioRegistrado = usuarioService.registrarUsuario(usuario);
-            UsuarioDTO dto = usuarioService.convertirADTO(usuarioRegistrado);
-            return new ResponseEntity<>(dto, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<UsuarioDTO> registrarUsuario(@Valid @RequestBody Usuario usuario) {
+        Usuario usuarioRegistrado = usuarioService.registrarUsuario(usuario);
+        UsuarioDTO dto = usuarioService.convertirADTO(usuarioRegistrado);
+        return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")

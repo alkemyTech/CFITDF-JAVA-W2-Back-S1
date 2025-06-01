@@ -37,7 +37,7 @@ public class Usuario {
 
     @NotBlank(message = "El DNI es obligatorio")
     @Column(unique = true)
-    private String DNI;
+    private String dni;
 
     @NotBlank(message = "El teléfono es obligatorio")
     private String telefono;

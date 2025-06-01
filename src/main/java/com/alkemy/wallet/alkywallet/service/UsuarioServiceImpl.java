@@ -1,6 +1,7 @@
 package com.alkemy.wallet.alkywallet.service;
 
 import com.alkemy.wallet.alkywallet.dto.UsuarioDTO;
+import com.alkemy.wallet.alkywallet.model.Rol;
 import com.alkemy.wallet.alkywallet.model.Usuario;
 import com.alkemy.wallet.alkywallet.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -103,9 +104,10 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Override
     public List<UsuarioDTO> listarUsuarios() {
-        // Obtiene solo los usuarios que no están borrados
+        // Obtiene todos los usuarios que no están borrados
         List<Usuario> usuarios = usuarioRepository.findAll();
         return usuarios.stream()
+                .filter(usuario -> usuario.getRol() == Rol.CLIENTE)
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
