@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import com.alkemy.wallet.alkywallet.repository.TarjetaRepository;
 
 @Service
 public class TarjetaServiceImpl implements ITarjetaService {
+	private final ModelMapper modelMapper = new ModelMapper();
 	@Autowired
 	private TarjetaRepository tarjetaRepository;
 
@@ -41,7 +43,7 @@ public class TarjetaServiceImpl implements ITarjetaService {
 		tarjeta.setNumero(generarNumeroTarjetaAleatorio());
 		actualizarCamposDesdeDTO(dto, tarjeta);
 		tarjetaRepository.save(tarjeta);
-		return new TarjetaDTO(tarjeta);
+		return convertirADTO(tarjeta);
 	}
 
 	// Listar todas las tarjetas con el atributo delete = false - READ
@@ -94,6 +96,16 @@ public class TarjetaServiceImpl implements ITarjetaService {
 		tarjetaRepository.save(tarjeta);
 	}
 
+	// Congelar tarjeta por id - PATCH
+	@Override
+	public void toggleCongelarTarjeta(Long id) {
+		Tarjeta tarjeta = tarjetaRepository.findById(id).orElseThrow(() -> {
+			return new RuntimeException("No se encontro la tarjeta con el id " + id);
+		});
+		tarjeta.setCongelada(!tarjeta.getCongelada());
+		tarjetaRepository.save(tarjeta);
+	}
+
 	private void actualizarCamposDesdeDTO(TarjetaDTO dto, Tarjeta tarjeta) {
 
 		if (dto.getTipo() != null) {
@@ -117,6 +129,11 @@ public class TarjetaServiceImpl implements ITarjetaService {
 			numero.append(random.nextInt(10));
 		}
 		return numero.toString();
+	}
+
+	@Override
+	public TarjetaDTO convertirADTO(Tarjeta tarjeta) {
+		return modelMapper.map(tarjeta, TarjetaDTO.class);
 	}
 
 }

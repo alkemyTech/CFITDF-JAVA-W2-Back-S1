@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,7 +36,7 @@ public class TarjetaController {
 			@ApiResponse(responseCode = "400", description = "Datos inválidos") })
 	public ResponseEntity<TarjetaDTO> crearCuenta(@RequestBody TarjetaDTO tarjetaPorCrear) {
 		TarjetaDTO dto = tarjetaService.crearTarjeta(tarjetaPorCrear);
-		return ResponseEntity.status(201).body(tarjetaPorCrear);
+		return ResponseEntity.status(201).body(dto);
 	}
 
 	// Listar
@@ -70,6 +71,15 @@ public class TarjetaController {
 			@ApiResponse(responseCode = "404", description = "Tarjeta no encontrada") })
 	public ResponseEntity<Void> eliminarTarjeta(@PathVariable Long id) {
 		tarjetaService.eliminarTarjeta(id);
+		return ResponseEntity.noContent().build();
+	}
+
+	@PatchMapping("/tarjetas/{id}/toggle-congelar")
+	@Operation(summary = "Modificar el estado de congelacion de una tarjeta")
+	@ApiResponses({ @ApiResponse(responseCode = "204", description = "Estado actualizado"),
+			@ApiResponse(responseCode = "404", description = "Tarjeta no encontrada") })
+	public ResponseEntity<Void> congelarTarjeta(@PathVariable Long id) {
+		tarjetaService.toggleCongelarTarjeta(id);
 		return ResponseEntity.noContent().build();
 	}
 
