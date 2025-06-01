@@ -60,6 +60,9 @@ public class Tarjeta {
 	@Column(nullable = false)
 	private Boolean deleted = false;
 
+	@Column(name = "congelada")
+	private Boolean congelada = false;
+
 	@OneToMany(mappedBy = "tarjeta", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonIgnore
 	private List<Transaccion> transacciones = new ArrayList<>();
