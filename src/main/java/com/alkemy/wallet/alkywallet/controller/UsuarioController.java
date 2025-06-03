@@ -102,4 +102,39 @@ public class UsuarioController {
             return new ResponseEntity<>("Error al actualizar el usuario.", HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PutMapping("/{id}/desactivar")
+    @Operation(summary = "Desactivar un usuario por ID", responses = {
+            @ApiResponse(responseCode = "200", description = "Usuario desactivado"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+            @ApiResponse(responseCode = "400", description = "Error en la actualización")
+    })
+    public ResponseEntity<String> desactivarUsuario(@PathVariable Long id) {
+        try {
+            usuarioService.desactivarUsuario(id);
+            return ResponseEntity.ok("Usuario desactivado correctamente.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al desactivar el usuario.");
+        }
+    }
+
+
+    @PutMapping("/{id}/activar")
+    @Operation(summary = "Activar un usuario por ID", responses = {
+            @ApiResponse(responseCode = "200", description = "Usuario activado"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+            @ApiResponse(responseCode = "400", description = "Error en la actualización")
+    })
+    public ResponseEntity<String> activarUsuario(@PathVariable Long id) {
+        try {
+            usuarioService.activarUsuario(id);
+            return ResponseEntity.ok("Usuario activado correctamente.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al activar el usuario.");
+        }
+    }
 }

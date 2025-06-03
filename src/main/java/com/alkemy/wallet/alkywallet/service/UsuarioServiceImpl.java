@@ -63,6 +63,13 @@ public class UsuarioServiceImpl implements IUsuarioService {
         usuarioExistente.setNombre(usuarioActualizado.getNombre());
         usuarioExistente.setApellido(usuarioActualizado.getApellido());
         usuarioExistente.setEmail(usuarioActualizado.getEmail());
+        usuarioExistente.setDni(usuarioActualizado.getDni());
+        usuarioExistente.setTelefono(usuarioActualizado.getTelefono());
+        usuarioExistente.setFechaNacimiento(usuarioActualizado.getFechaNacimiento());
+        usuarioExistente.setDireccion(usuarioActualizado.getDireccion());
+        usuarioExistente.setNumeroD(usuarioActualizado.getNumeroD());
+        usuarioExistente.setProvincia(usuarioActualizado.getProvincia());
+        usuarioExistente.setCiudad(usuarioActualizado.getCiudad());
 
         // Si se proporciona una nueva contraseña, codifícala y actualízala
         if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().isEmpty()) {
@@ -95,6 +102,15 @@ public class UsuarioServiceImpl implements IUsuarioService {
         usuarioRepository.save(usuario);
     }
 
+    @Override
+    public void activarUsuario(@NotBlank Long id){
+        Usuario usuario = usuarioRepository.findByIdAndBorradoFalse(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + id));
+
+        usuario.setActivo(true);
+        usuarioRepository.save(usuario);
+    }
+
     public UsuarioDTO buscarUsuPorId(Long id) {
         // Verifica si el usuario existe y no está borrado
         return usuarioRepository.findByIdAndBorradoFalse(id)
@@ -105,7 +121,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
     @Override
     public List<UsuarioDTO> listarUsuarios() {
         // Obtiene todos los usuarios que no están borrados
-        List<Usuario> usuarios = usuarioRepository.findAll();
+        List<Usuario> usuarios = usuarioRepository.findByBorradoFalse();
         return usuarios.stream()
                 .filter(usuario -> usuario.getRol() == Rol.CLIENTE)
                 .map(this::convertirADTO)

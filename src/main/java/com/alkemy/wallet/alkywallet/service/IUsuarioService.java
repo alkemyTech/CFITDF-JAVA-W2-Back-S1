@@ -12,6 +12,7 @@ public interface IUsuarioService {
     UsuarioDTO actualizarUsuario(Long id, Usuario usuarioActualizado);
     void eliminarUsuario(@NotBlank Long id);
     void desactivarUsuario(@NotBlank Long id);
+    void activarUsuario(@NotBlank Long id);
     UsuarioDTO buscarUsuarioPorId(@NotBlank Long id);
     UsuarioDTO buscarUsuarioPorEmail(@NotBlank String email);
     UsuarioDTO convertirADTO(Usuario usuario);

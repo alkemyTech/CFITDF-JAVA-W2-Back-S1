@@ -45,12 +45,16 @@ public class Usuario {
     @Temporal(TemporalType.DATE)
     private LocalDate fechaNacimiento;
 
+    @NotBlank(message = "La provincia es obligatoria")
     private String provincia;
 
+    @NotBlank(message = "La ciudad es obligatoria")
     private String ciudad;
 
     @NotBlank(message = "La dirección es obligatoria")
     private String direccion;
+
+    private String numeroD;
 
     private boolean activo = true;
 
