@@ -84,7 +84,7 @@ public class TransaccionService implements ITransaccionService {
 		transaccion.setDescripcion(requestDTO.getDescripcion());
 		transaccion.setTipoTransaccion(requestDTO.getTipoTransaccion());
 		transaccion.setTarjeta(tarjeta);
-
 		return transaccion;
 	}
+
 }

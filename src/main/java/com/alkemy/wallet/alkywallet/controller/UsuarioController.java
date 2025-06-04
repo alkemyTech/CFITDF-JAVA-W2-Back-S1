@@ -1,5 +1,6 @@
 package com.alkemy.wallet.alkywallet.controller;
 
+import com.alkemy.wallet.alkywallet.dto.CambiarContraseñaDTO;
 import com.alkemy.wallet.alkywallet.dto.UsuarioDTO;
 import com.alkemy.wallet.alkywallet.model.Usuario;
 import com.alkemy.wallet.alkywallet.service.UsuarioServiceImpl;
@@ -12,7 +13,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -137,4 +137,26 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al activar el usuario.");
         }
     }
+
+    @PutMapping("/{id}/cambiar-contrasena")
+    @Operation(summary = "Cambiar la contraseña de un usuario por ID", responses = {
+            @ApiResponse(responseCode = "200", description = "Contraseña cambiada exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+            @ApiResponse(responseCode = "400", description = "Error en la actualización de la contraseña")
+    })
+    public ResponseEntity<?> cambiarContrasena(
+            @Parameter(description = "ID del usuario") @PathVariable Long id,
+            @RequestBody CambiarContraseñaDTO cambiarContraseñaDTO) {
+        try {
+            usuarioService.cambiarContrasena(id, cambiarContraseñaDTO);
+            return new ResponseEntity<>("Contraseña cambiada exitosamente.", HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>("No se encontró un usuario con el ID: " + id, HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al cambiar la contraseña.", HttpStatus.BAD_REQUEST);
+        }
+    }
+    
 }

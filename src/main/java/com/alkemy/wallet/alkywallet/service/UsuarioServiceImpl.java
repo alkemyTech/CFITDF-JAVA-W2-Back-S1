@@ -1,5 +1,6 @@
 package com.alkemy.wallet.alkywallet.service;
 
+import com.alkemy.wallet.alkywallet.dto.CambiarContraseñaDTO;
 import com.alkemy.wallet.alkywallet.dto.UsuarioDTO;
 import com.alkemy.wallet.alkywallet.model.Rol;
 import com.alkemy.wallet.alkywallet.model.Usuario;
@@ -10,6 +11,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -83,6 +86,26 @@ public class UsuarioServiceImpl implements IUsuarioService {
         return convertirADTO(usuarioGuardado);
     }
 
+    @Override
+    @Transactional
+    public void cambiarContrasena(Long id, CambiarContraseñaDTO cambiarContraseñaDTO) {
+        // Buscar el usuario por ID
+        Usuario usuario = usuarioRepository.findByIdAndBorradoFalse(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + id));
+
+        // Verificar la contraseña actual
+        if (!passwordEncoder.matches(cambiarContraseñaDTO.getContrasenaActual(), usuario.getPassword())) {
+            throw new IllegalArgumentException("La contraseña actual es incorrecta.");
+        }
+
+        // Actualizar la contraseña
+        usuario.setPassword(passwordEncoder.encode(cambiarContraseñaDTO.getNuevaContrasena()));
+        usuarioRepository.save(usuario);
+
+        log.info("Contraseña actualizada para el usuario con ID: {}", id);
+    }
+
+
 
     @Override
     public void eliminarUsuario(Long id) {
@@ -141,6 +164,38 @@ public class UsuarioServiceImpl implements IUsuarioService {
         return usuarioRepository.findByEmailAndBorradoFalse(email)
                 .map(this::convertirADTO) // Convierte a DTO si se encuentra
                 .orElseThrow(() -> new EntityNotFoundException("No se encontró un usuario con el email: " + email)); // Lanza excepción si no se encuentra
+    }
+
+    @Autowired
+    private JavaMailSender mailSender; // Para enviar correos electrónicos
+
+    // Método para enviar el correo de recuperación
+    public void enviarEmailRecuperacion(String email) {
+        if (!usuarioRepository.existsByEmailAndBorradoFalse(email)) {
+            throw new IllegalArgumentException("Correo no registrado");
+        }
+
+        String enlaceRecuperacion = "http://127.0.0.1:5500/static/restablecerContrase%C3%B1a.html?email=" + email;
+
+        SimpleMailMessage mensaje = new SimpleMailMessage();
+        mensaje.setTo(email);
+        mensaje.setSubject("Recuperación de Contraseña");
+        mensaje.setText("Haz clic en el siguiente enlace para restablecer tu contraseña: " + enlaceRecuperacion);
+        mailSender.send(mensaje);
+
+        log.info("Correo de recuperación enviado a: {}", email);
+    }
+
+    // Método para cambiar la contraseña
+    public void cambiarContrasena(String email, String nuevaContrasena) {
+        Usuario usuario = usuarioRepository.findByEmailAndBorradoFalse(email)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con el email: " + email));
+
+        // Codificar la nueva contraseña
+        usuario.setPassword(passwordEncoder.encode(nuevaContrasena));
+        usuarioRepository.save(usuario);
+
+        log.info("Contraseña actualizada para el usuario: {}", email);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.alkemy.wallet.alkywallet.service;
 
+import com.alkemy.wallet.alkywallet.dto.CambiarContraseñaDTO;
 import com.alkemy.wallet.alkywallet.dto.UsuarioDTO;
 import com.alkemy.wallet.alkywallet.model.Usuario;
 import jakarta.validation.constraints.NotBlank;
@@ -13,6 +14,7 @@ public interface IUsuarioService {
     void eliminarUsuario(@NotBlank Long id);
     void desactivarUsuario(@NotBlank Long id);
     void activarUsuario(@NotBlank Long id);
+    void cambiarContrasena(Long id, CambiarContraseñaDTO cambiarContraseñaDTO);
     UsuarioDTO buscarUsuarioPorId(@NotBlank Long id);
     UsuarioDTO buscarUsuarioPorEmail(@NotBlank String email);
     UsuarioDTO convertirADTO(Usuario usuario);
