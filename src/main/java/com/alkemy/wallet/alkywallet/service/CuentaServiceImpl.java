@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -56,11 +57,17 @@ public class CuentaServiceImpl implements ICuentaService {
         cuenta.setTipo(tipoCuenta);
         cuenta.setUsuario(usuario);
 
+        // Generar y asignar CBU único
+        String cbu = generarCBUAleatorio();
+        log.debug("CBU generado para nueva cuenta: {}", cbu);
+        cuenta.setCbu(cbu);
+
         Cuenta cuentaGuardada = cuentaRepository.save(cuenta);
-        log.info("Cuenta creada exitosamente con ID: {}", cuentaGuardada.getId());
+        log.info("Cuenta creada exitosamente con ID: {} y CBU: {}", cuentaGuardada.getId(), cuentaGuardada.getCbu());
 
         return new CuentaDTO(cuentaGuardada);
     }
+
 
     @Override
     public Cuenta crearCuentaAutomatica(Usuario usuario) {
@@ -249,5 +256,14 @@ public class CuentaServiceImpl implements ICuentaService {
             throw new BadRequestException("Tipo de cuenta inválido: " + tipo);
         }
     }
+
+    private String generarCBUAleatorio() {
+        String cbu;
+        do {
+            cbu = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase().substring(0, 22);
+        } while (cuentaRepository.findByCbu(cbu).isPresent());
+        return cbu;
+    }
+
 }
 
