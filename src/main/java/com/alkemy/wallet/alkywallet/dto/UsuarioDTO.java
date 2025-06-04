@@ -26,11 +26,12 @@ public class UsuarioDTO {
     private String telefono;
     private LocalDate fechaNacimiento;
     private String direccion;
+    private String numeroD;
     private String provincia;
     private String ciudad;
     private Rol rol;
     @Temporal(TemporalType.DATE)
     private LocalDate fechaRegistro;
-    private boolean enabled = true;
+    private boolean activo;
     private List<Cuenta> cuentas = new ArrayList<>();
 }
