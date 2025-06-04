@@ -175,7 +175,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
             throw new IllegalArgumentException("Correo no registrado");
         }
 
-        String enlaceRecuperacion = "http://127.0.0.1:5500/static/restablecerContrase%C3%B1a.html?email=" + email;
+        String enlaceRecuperacion = "http://localhost:5500/static/restablecerContrase%C3%B1a.html?email=" + email;
 
         SimpleMailMessage mensaje = new SimpleMailMessage();
         mensaje.setTo(email);
