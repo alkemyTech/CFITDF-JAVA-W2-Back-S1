@@ -35,6 +35,9 @@ public class Cuenta {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(unique = true, nullable = false)
+	private String cbu;
+
 	@PositiveOrZero(message = "El saldo no puede ser negativo")
 	private Double saldo;
 
