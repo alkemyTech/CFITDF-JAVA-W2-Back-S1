@@ -14,12 +14,14 @@ import com.alkemy.wallet.alkywallet.repository.IPagoRepository;
 import com.alkemy.wallet.alkywallet.repository.TarjetaRepository;
 import com.alkemy.wallet.alkywallet.repository.UsuarioRepository;
 import com.alkemy.wallet.alkywallet.service.ICuentaService;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -39,6 +41,7 @@ public class CuentaServiceImpl implements ICuentaService {
     @Autowired
     private TarjetaRepository tarjetaRepository;
 
+    @Transactional
     @Override
     public CuentaDTO crearCuenta(CuentaRequestDTO dto) {
         log.info("Intentando crear cuenta para usuario ID: {}", dto.getUsuarioId());
@@ -58,7 +61,7 @@ public class CuentaServiceImpl implements ICuentaService {
         cuenta.setUsuario(usuario);
 
         // Generar y asignar CBU único
-        String cbu = generarCBUAleatorio();
+        String cbu = generarCBUAleatorioUnico();
         log.debug("CBU generado para nueva cuenta: {}", cbu);
         cuenta.setCbu(cbu);
 
@@ -67,6 +70,7 @@ public class CuentaServiceImpl implements ICuentaService {
 
         return new CuentaDTO(cuentaGuardada);
     }
+
 
 
     @Override
@@ -79,11 +83,17 @@ public class CuentaServiceImpl implements ICuentaService {
         cuenta.setUsuario(usuario);
         cuenta.setDeleted(false);
 
+        // ✅ Generar y asignar CBU único
+        String cbu = generarCBUAleatorioUnico();
+        cuenta.setCbu(cbu);
+        log.debug("CBU generado automáticamente: {}", cbu);
+
         Cuenta cuentaGuardada = cuentaRepository.save(cuenta);
         log.info("Cuenta automática creada exitosamente con ID: {}", cuentaGuardada.getId());
 
         return cuentaGuardada;
     }
+
 
     @Override
     public CuentaDTO obtenerCuentaPorId(Long id) {
@@ -264,6 +274,21 @@ public class CuentaServiceImpl implements ICuentaService {
         } while (cuentaRepository.findByCbu(cbu).isPresent());
         return cbu;
     }
+
+    private String generarCBUAleatorioUnico() {
+        int intentos = 0;
+        String cbu;
+
+        do {
+            if (++intentos > 10) {
+                throw new IllegalStateException("No se pudo generar un CBU único después de varios intentos");
+            }
+            cbu = String.format("%022d", new Random().nextLong() & Long.MAX_VALUE);
+        } while (cuentaRepository.existsByCbu(cbu));
+
+        return cbu;
+    }
+
 
 }
 
