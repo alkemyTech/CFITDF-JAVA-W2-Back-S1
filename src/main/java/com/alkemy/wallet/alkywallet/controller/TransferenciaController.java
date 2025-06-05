@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 @Tag(name = "Transferencias", description = "Operaciones de transferencia entre cuentas")
 @RestController
 @RequestMapping("/api/transferencias")
@@ -28,8 +33,16 @@ public class TransferenciaController {
             @ApiResponse(responseCode = "400", description = "Datos inválidos o error de negocio")
     })
     @PostMapping
-    public ResponseEntity<String> transferir(@Valid @RequestBody TransferenciaRequestDTO dto) {
-        transferenciaService.realizarTransferencia(dto);
-        return ResponseEntity.ok("Transferencia realizada con éxito");
+        public ResponseEntity<Map<String, Object>> transferir(@Valid @RequestBody TransferenciaRequestDTO dto) {
+            transferenciaService.realizarTransferencia(dto);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("exitosa", true);
+            response.put("mensaje", "Transferencia realizada con éxito");
+            response.put("numeroOperacion", UUID.randomUUID().toString());
+            response.put("fechaTransferencia", LocalDateTime.now());
+            response.put("monto", dto.getMonto());
+
+            return ResponseEntity.ok(response);
+        }
     }
-}
