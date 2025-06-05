@@ -24,4 +24,7 @@ public interface ICuentaRepository extends JpaRepository<Cuenta, Long> {
     Cuenta findByIdAndDeletedFalse(Long id);
 
     Optional<Cuenta> findByCbu(String cbu);
+
+    boolean existsByCbu(String cbu);
+
 }
