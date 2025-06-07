@@ -35,4 +35,7 @@ public interface ICuentaService {
 
     Cuenta crearCuentaAutomatica(Usuario usuario);
 
+    CuentaDTO cargarSaldo(Long cuentaId, Double monto);
+
+
 }
