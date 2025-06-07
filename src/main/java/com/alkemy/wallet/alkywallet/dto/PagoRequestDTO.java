@@ -16,8 +16,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class PagoRequestDTO {
 
-    // No es necesario incluir el ID aquí si nunca lo recibes en la creación,
-    // pero lo dejamos por si en PUT deseas enviar el id en el body.
     private Long id;
 
     @NotNull(message = "El monto no puede ser nulo")
@@ -28,6 +26,7 @@ public class PagoRequestDTO {
     private String comercio;
 
     @NotNull(message = "La fecha es obligatoria")
+    // Se espera que Jackson reciba un ISO-8601 compatible, p.ej. "2025-06-01T14:30:00"
     private LocalDateTime fecha;
 
     @NotNull(message = "La cuenta es obligatoria")
