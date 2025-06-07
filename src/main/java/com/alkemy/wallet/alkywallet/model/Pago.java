@@ -1,5 +1,6 @@
 package com.alkemy.wallet.alkywallet.model;
 
+import com.alkemy.wallet.alkywallet.dto.MovimientoDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 
@@ -35,6 +37,20 @@ public class Pago {
     @JoinColumn(name = "cuenta_id", nullable = false)
     @JsonIgnore
     private Cuenta cuenta;
+
+    public static MovimientoDTO fromPago(Pago pago) {
+        LocalDate fecha = pago.getFecha().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        return new MovimientoDTO(
+                "PAGO",
+                pago.getMonto(),
+                pago.getComercio(), // usamos comercio como descripción
+                fecha
+        );
+    }
+
 
     @Override
     public String toString() {

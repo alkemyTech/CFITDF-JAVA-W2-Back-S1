@@ -3,6 +3,8 @@ package com.alkemy.wallet.alkywallet.repository;
 import com.alkemy.wallet.alkywallet.model.Cuenta;
 import com.alkemy.wallet.alkywallet.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -26,6 +28,13 @@ public interface ICuentaRepository extends JpaRepository<Cuenta, Long> {
     Optional<Cuenta> findByCbu(String cbu);
 
     boolean existsByCbu(String cbu);
+
+    @Query("SELECT c FROM Cuenta c " +
+            "LEFT JOIN FETCH c.pagos " +
+            "LEFT JOIN FETCH c.transacciones " +
+            "WHERE c.id = :id AND c.deleted = false")
+    Cuenta findByIdWithMovimientos(@Param("id") Long id);
+
 
 
 

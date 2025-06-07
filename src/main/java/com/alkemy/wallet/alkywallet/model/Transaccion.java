@@ -1,5 +1,6 @@
 package com.alkemy.wallet.alkywallet.model;
 
+import com.alkemy.wallet.alkywallet.dto.MovimientoDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -33,4 +34,14 @@ public class Transaccion {
     @ManyToOne
     @JoinColumn(name = "tarjeta_id")
     private Tarjeta tarjeta;
+
+    public static MovimientoDTO fromTransaccion(Transaccion tx) {
+        return new MovimientoDTO(
+                "TRANSACCION",
+                tx.getMonto(),
+                tx.getDescripcion(),
+                tx.getFecha() // ya es LocalDate, da "yyyy-MM-dd"
+        );
+    }
+
 }
