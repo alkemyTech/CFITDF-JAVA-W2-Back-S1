@@ -255,6 +255,26 @@ public class CuentaServiceImpl implements ICuentaService {
         return resumen;
     }
 
+    @Transactional
+    @Override
+    public CuentaDTO cargarSaldo(Long cuentaId, Double monto) {
+        if (monto == null || monto <= 0) {
+            throw new BadRequestException("El monto debe ser mayor a 0");
+        }
+
+        Cuenta cuenta = cuentaRepository.findByIdAndDeletedFalse(cuentaId);
+        if (cuenta == null) {
+            throw new ResourceNotFoundException("Cuenta no encontrada");
+        }
+
+        cuenta.setSaldo(cuenta.getSaldo() + monto);
+        Cuenta cuentaActualizada = cuentaRepository.save(cuenta);
+
+        return new CuentaDTO(cuentaActualizada);
+    }
+
+
+
 
     // ---------- Métodos auxiliares ----------
 

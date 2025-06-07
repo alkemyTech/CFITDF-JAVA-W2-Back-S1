@@ -27,4 +27,6 @@ public interface ICuentaRepository extends JpaRepository<Cuenta, Long> {
 
     boolean existsByCbu(String cbu);
 
+
+
 }

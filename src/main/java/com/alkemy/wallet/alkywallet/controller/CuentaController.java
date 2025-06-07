@@ -1,5 +1,6 @@
 package com.alkemy.wallet.alkywallet.controller;
 
+import com.alkemy.wallet.alkywallet.dto.CargaSaldoRequestDTO;
 import com.alkemy.wallet.alkywallet.dto.CuentaDTO;
 import com.alkemy.wallet.alkywallet.dto.CuentaRequestDTO;
 import com.alkemy.wallet.alkywallet.dto.ResumenCuentaDTO;
@@ -108,5 +109,20 @@ public class CuentaController {
     public ResponseEntity<ResumenCuentaDTO> obtenerResumenCuenta(@PathVariable Long id) {
         return ResponseEntity.ok(cuentaService.obtenerResumenCuenta(id));
     }
+
+    @Operation(summary = "Cargar saldo en una cuenta")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Saldo cargado correctamente"),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos (por ejemplo, monto negativo o nulo)"),
+            @ApiResponse(responseCode = "404", description = "Cuenta no encontrada")
+    })
+    @PatchMapping("/cargar-saldo")
+    public ResponseEntity<CuentaDTO> cargarSaldo(
+            @Valid @RequestBody CargaSaldoRequestDTO dto) {
+
+        CuentaDTO cuentaActualizada = cuentaService.cargarSaldo(dto.getCuentaId(), dto.getMonto());
+        return ResponseEntity.ok(cuentaActualizada);
+    }
+
 
 }
