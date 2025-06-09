@@ -1,0 +1,314 @@
+package com.alkemy.wallet.alkywallet.service;
+
+import com.alkemy.wallet.alkywallet.dto.CuentaDTO;
+import com.alkemy.wallet.alkywallet.dto.CuentaRequestDTO;
+import com.alkemy.wallet.alkywallet.dto.ResumenCuentaDTO;
+import com.alkemy.wallet.alkywallet.exception.BadRequestException;
+import com.alkemy.wallet.alkywallet.exception.ResourceNotFoundException;
+import com.alkemy.wallet.alkywallet.model.Cuenta;
+import com.alkemy.wallet.alkywallet.model.TipoCuenta;
+import com.alkemy.wallet.alkywallet.model.Transaccion;
+import com.alkemy.wallet.alkywallet.model.Usuario;
+import com.alkemy.wallet.alkywallet.repository.ICuentaRepository;
+import com.alkemy.wallet.alkywallet.repository.IPagoRepository;
+import com.alkemy.wallet.alkywallet.repository.TarjetaRepository;
+import com.alkemy.wallet.alkywallet.repository.UsuarioRepository;
+import com.alkemy.wallet.alkywallet.service.ICuentaService;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Slf4j
+@Service
+public class CuentaServiceImpl implements ICuentaService {
+
+    @Autowired
+    private ICuentaRepository cuentaRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private IPagoRepository pagoRepository;
+
+    @Autowired
+    private TarjetaRepository tarjetaRepository;
+
+    @Transactional
+    @Override
+    public CuentaDTO crearCuenta(CuentaRequestDTO dto) {
+        log.info("Intentando crear cuenta para usuario ID: {}", dto.getUsuarioId());
+
+        Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
+                .orElseThrow(() -> {
+                    log.warn("Usuario no encontrado con ID: {}", dto.getUsuarioId());
+                    return new ResourceNotFoundException("Usuario no encontrado");
+                });
+
+        TipoCuenta tipoCuenta = tryParseTipoCuenta(dto.getTipo());
+        log.debug("Tipo de cuenta recibido y validado: {}", tipoCuenta);
+
+        Cuenta cuenta = new Cuenta();
+        cuenta.setSaldo(dto.getSaldo());
+        cuenta.setTipo(tipoCuenta);
+        cuenta.setUsuario(usuario);
+
+        // Generar y asignar CBU único
+        String cbu = generarCBUAleatorioUnico();
+        log.debug("CBU generado para nueva cuenta: {}", cbu);
+        cuenta.setCbu(cbu);
+
+        Cuenta cuentaGuardada = cuentaRepository.save(cuenta);
+        log.info("Cuenta creada exitosamente con ID: {} y CBU: {}", cuentaGuardada.getId(), cuentaGuardada.getCbu());
+
+        return new CuentaDTO(cuentaGuardada);
+    }
+
+
+
+    @Override
+    public Cuenta crearCuentaAutomatica(Usuario usuario) {
+        log.info("Creando cuenta automática para usuario ID: {}", usuario.getId());
+
+        Cuenta cuenta = new Cuenta();
+        cuenta.setSaldo(0.0); // Saldo inicial en cero
+        cuenta.setTipo(TipoCuenta.CAJA_AHORRO);
+        cuenta.setUsuario(usuario);
+        cuenta.setDeleted(false);
+
+        // ✅ Generar y asignar CBU único
+        String cbu = generarCBUAleatorioUnico();
+        cuenta.setCbu(cbu);
+        log.debug("CBU generado automáticamente: {}", cbu);
+
+        Cuenta cuentaGuardada = cuentaRepository.save(cuenta);
+        log.info("Cuenta automática creada exitosamente con ID: {}", cuentaGuardada.getId());
+
+        return cuentaGuardada;
+    }
+
+
+    @Override
+    public CuentaDTO obtenerCuentaPorId(Long id) {
+        log.info("Buscando cuenta por ID: {}", id);
+
+        return cuentaRepository.findById(id)
+                .filter(cuenta -> !cuenta.isDeleted())
+                .map(cuenta -> {
+                    log.debug("Cuenta encontrada: ID {}", cuenta.getId());
+                    return new CuentaDTO(cuenta);
+                })
+                .orElseThrow(() -> {
+                    log.warn("Cuenta no encontrada con ID: {}", id);
+                    return new ResourceNotFoundException("Cuenta no encontrada");
+                });
+    }
+
+    @Override
+    public List<CuentaDTO> listarCuentas() {
+        log.info("Listando todas las cuentas activas");
+
+        List<CuentaDTO> cuentas = cuentaRepository.findByDeletedFalse()
+                .stream()
+                .map(CuentaDTO::new)
+                .collect(Collectors.toList());
+
+        log.debug("Cantidad de cuentas activas encontradas: {}", cuentas.size());
+        return cuentas;
+    }
+
+    @Override
+    public CuentaDTO actualizarCuenta(Long id, CuentaRequestDTO dto) {
+        log.info("Actualizando cuenta con ID: {}", id);
+
+        Cuenta cuenta = cuentaRepository.findById(id)
+                .filter(c -> !c.isDeleted())
+                .orElseThrow(() -> {
+                    log.warn("Cuenta no encontrada para actualización: ID {}", id);
+                    return new ResourceNotFoundException("Cuenta no encontrada");
+                });
+
+        if (dto.getSaldo() != null && dto.getSaldo() >= 0) {
+            log.debug("Actualizando saldo: {}", dto.getSaldo());
+            cuenta.setSaldo(dto.getSaldo());
+        }
+
+        if (dto.getTipo() != null) {
+            TipoCuenta tipoCuenta = tryParseTipoCuenta(dto.getTipo());
+            log.debug("Actualizando tipo de cuenta a: {}", tipoCuenta);
+            cuenta.setTipo(tipoCuenta);
+        }
+
+        Cuenta cuentaActualizada = cuentaRepository.save(cuenta);
+        log.info("Cuenta actualizada correctamente: ID {}", cuentaActualizada.getId());
+
+        return new CuentaDTO(cuentaActualizada);
+    }
+
+    @Override
+    public void eliminarCuenta(Long id) {
+        log.info("Eliminando lógicamente cuenta ID: {}", id);
+
+        Cuenta cuenta = cuentaRepository.findById(id)
+                .filter(c -> !c.isDeleted())
+                .orElseThrow(() -> {
+                    log.warn("Cuenta no encontrada para eliminación: ID {}", id);
+                    return new ResourceNotFoundException("Cuenta no encontrada");
+                });
+
+        cuenta.setDeleted(true);
+        cuentaRepository.save(cuenta);
+
+        log.info("Cuenta marcada como eliminada: ID {}", id);
+    }
+
+    @Override
+    public List<CuentaDTO> listarCuentasPorUsuario(Long usuarioId) {
+        log.info("Listando cuentas del usuario ID: {}", usuarioId);
+
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> {
+                    log.warn("Usuario no encontrado al listar cuentas: ID {}", usuarioId);
+                    return new ResourceNotFoundException("Usuario no encontrado");
+                });
+
+        List<CuentaDTO> cuentas = cuentaRepository.findByUsuario(usuario)
+                .stream()
+                .filter(cuenta -> !cuenta.isDeleted())
+                .map(CuentaDTO::new)
+                .collect(Collectors.toList());
+
+        log.debug("Cantidad de cuentas activas del usuario ID {}: {}", usuarioId, cuentas.size());
+        return cuentas;
+    }
+
+    @Override
+    public CuentaDTO cambiarTipoCuenta(Long id, String nuevoTipo) {
+        log.info("Cambiando tipo de cuenta para ID: {} a {}", id, nuevoTipo);
+
+        Cuenta cuenta = cuentaRepository.findById(id)
+                .filter(c -> !c.isDeleted())
+                .orElseThrow(() -> {
+                    log.warn("Cuenta no encontrada para cambiar tipo: ID {}", id);
+                    return new ResourceNotFoundException("Cuenta no encontrada");
+                });
+
+        TipoCuenta tipoCuenta = tryParseTipoCuenta(nuevoTipo);
+        cuenta.setTipo(tipoCuenta);
+
+        Cuenta actualizada = cuentaRepository.save(cuenta);
+        log.info("Tipo de cuenta actualizado para ID {} a {}", id, tipoCuenta);
+
+        return new CuentaDTO(actualizada);
+    }
+
+    @Override
+    public ResumenCuentaDTO obtenerResumenCuenta(Long cuentaId) {
+        Cuenta cuenta = cuentaRepository.findById(cuentaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cuenta no encontrada con ID: " + cuentaId));
+
+        List<Transaccion> transacciones = cuenta.getTransacciones();
+
+        double depositado = 0, extraido = 0, transferido = 0, pagado = 0;
+        LocalDate ultimaFecha = null;
+
+        String tipoUltima = null;
+        Double montoUltima = null;
+        String descripcionUltima = null;
+
+        for (Transaccion t : transacciones) {
+            switch (t.getTipoTransaccion()) {
+                case DEPOSITO -> depositado += t.getMonto();
+                case EXTRACCION -> extraido += t.getMonto();
+                case TRANSFERENCIA -> transferido += t.getMonto();
+                case PAGO -> pagado += t.getMonto();
+            }
+
+            if (ultimaFecha == null || t.getFecha().isAfter(ultimaFecha)) {
+                ultimaFecha = t.getFecha();
+                tipoUltima = t.getTipoTransaccion().name();
+                montoUltima = t.getMonto();
+                descripcionUltima = t.getDescripcion();
+            }
+        }
+
+        ResumenCuentaDTO resumen = new ResumenCuentaDTO();
+        resumen.setCuentaId(cuenta.getId());
+        resumen.setSaldoActual(cuenta.getSaldo());
+        resumen.setTotalDepositado(depositado);
+        resumen.setTotalExtraido(extraido);
+        resumen.setTotalTransferido(transferido);
+        resumen.setTotalPagado(pagado);
+        resumen.setCantidadTransacciones(transacciones.size());
+        resumen.setFechaUltimaTransaccion(ultimaFecha);
+        resumen.setTipoUltimaTransaccion(tipoUltima);
+        resumen.setMontoUltimaTransaccion(montoUltima);
+        resumen.setDescripcionUltimaTransaccion(descripcionUltima);
+
+        return resumen;
+    }
+
+    @Transactional
+    @Override
+    public CuentaDTO cargarSaldo(Long cuentaId, Double monto) {
+        if (monto == null || monto <= 0) {
+            throw new BadRequestException("El monto debe ser mayor a 0");
+        }
+
+        Cuenta cuenta = cuentaRepository.findByIdAndDeletedFalse(cuentaId);
+        if (cuenta == null) {
+            throw new ResourceNotFoundException("Cuenta no encontrada");
+        }
+
+        cuenta.setSaldo(cuenta.getSaldo() + monto);
+        Cuenta cuentaActualizada = cuentaRepository.save(cuenta);
+
+        return new CuentaDTO(cuentaActualizada);
+    }
+
+
+
+
+    // ---------- Métodos auxiliares ----------
+
+    private TipoCuenta tryParseTipoCuenta(String tipo) {
+        try {
+            return TipoCuenta.valueOf(tipo.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            log.error("Tipo de cuenta inválido recibido: {}", tipo);
+            throw new BadRequestException("Tipo de cuenta inválido: " + tipo);
+        }
+    }
+
+    private String generarCBUAleatorio() {
+        String cbu;
+        do {
+            cbu = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase().substring(0, 22);
+        } while (cuentaRepository.findByCbu(cbu).isPresent());
+        return cbu;
+    }
+
+    private String generarCBUAleatorioUnico() {
+        int intentos = 0;
+        String cbu;
+
+        do {
+            if (++intentos > 10) {
+                throw new IllegalStateException("No se pudo generar un CBU único después de varios intentos");
+            }
+            cbu = String.format("%022d", new Random().nextLong() & Long.MAX_VALUE);
+        } while (cuentaRepository.existsByCbu(cbu));
+
+        return cbu;
+    }
+
+
+}
+
